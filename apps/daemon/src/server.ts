@@ -11,7 +11,11 @@ const app = express();
 const server = createServer(app);
 const wsServer = new WebSocketServer({ server, path: "/ws" });
 
-const workspaceRoot = process.env.AGENTACTION_ROOT ?? path.resolve(process.cwd());
+const workspaceRoot =
+  process.env.AGENTACTION_ROOT ??
+  (process.cwd().endsWith(path.join("apps", "daemon"))
+    ? path.resolve(process.cwd(), "../..")
+    : path.resolve(process.cwd()));
 const port = Number(process.env.AGENTACTION_DAEMON_PORT ?? 4318);
 const store = new AppStore(workspaceRoot);
 

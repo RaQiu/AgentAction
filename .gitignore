@@ -8,5 +8,6 @@ coverage
 .turbo
 apps/desktop/out
 apps/desktop/release
-apps/daemon/.agentaction-data
+apps/daemon/.agentaction-data/
+apps/daemon/apps/
 *.tsbuildinfo
