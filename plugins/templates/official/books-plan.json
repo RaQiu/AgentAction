@@ -1,0 +1,6 @@
+{
+  "id": "tpl_books_summary_plan",
+  "title": "帮我读文件夹里的电子书并导出总结与学习规划",
+  "tagline": "逐本阅读、逐本总结，再生成可执行的学习路线。",
+  "templateType": "official-task-card"
+}

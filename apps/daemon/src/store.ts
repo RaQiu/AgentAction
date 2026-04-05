@@ -5,6 +5,7 @@ import {
   type Conversation,
   type EventEnvelope,
   type PluginDirectoryEntry,
+  type ProviderConfig,
   type QueuedMessage,
   type Role,
   type RoleSelection,
@@ -19,6 +20,7 @@ import {
   getOfficialTemplates,
   nowIso
 } from "@agentaction/shared";
+import { getDefaultProviders } from "@agentaction/provider-core";
 import {
   addAssistantEvent,
   addUserMessage,
@@ -69,6 +71,12 @@ export class AppStore {
         this.db.upsert("runtimes", runtime, nowIso())
       );
     }
+
+    if (this.db.list<ProviderConfig>("providers").length === 0) {
+      getDefaultProviders().forEach((provider) =>
+        this.db.upsert("providers", provider, nowIso())
+      );
+    }
   }
 
   bootstrap(): AppBootstrap {
@@ -80,6 +88,7 @@ export class AppStore {
       roles: this.db.list("roles"),
       equipment: this.db.list("equipment"),
       runtimes: this.db.list("runtimes"),
+      providers: this.db.list("providers"),
       tasks,
       assets,
       pluginInventory: this.scanPluginInventory()

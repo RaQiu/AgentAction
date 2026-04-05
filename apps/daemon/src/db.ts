@@ -7,6 +7,7 @@ type RecordKind =
   | "roles"
   | "equipment"
   | "runtimes"
+  | "providers"
   | "tasks";
 
 export class LocalDatabase {

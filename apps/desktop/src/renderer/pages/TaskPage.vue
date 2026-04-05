@@ -82,6 +82,21 @@
             </li>
           </ul>
         </section>
+
+        <section class="card">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">分享记录</p>
+              <h3>任务级分享，而不是共享整个工作台</h3>
+            </div>
+          </div>
+          <ul class="list">
+            <li v-for="shareItem in task.shares" :key="shareItem.id">
+              <strong>{{ shareItem.url }}</strong>
+              <span>{{ formatDate(shareItem.createdAt) }}</span>
+            </li>
+          </ul>
+        </section>
       </div>
     </section>
   </section>

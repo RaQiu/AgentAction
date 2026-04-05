@@ -4,7 +4,7 @@
   "private": true,
   "packageManager": "pnpm@10.24.0",
   "scripts": {
-    "build:packages": "pnpm --filter @agentaction/shared build && pnpm --filter @agentaction/runtime-core build && pnpm --filter @agentaction/plugin-core build && pnpm --filter @agentaction/task-engine build",
+    "build:packages": "pnpm --filter @agentaction/shared build && pnpm --filter @agentaction/runtime-core build && pnpm --filter @agentaction/plugin-core build && pnpm --filter @agentaction/provider-core build && pnpm --filter @agentaction/task-engine build",
     "dev": "pnpm build:packages && concurrently -k \"pnpm --filter @agentaction/daemon dev\" \"pnpm --filter @agentaction/desktop dev\"",
     "build": "pnpm build:packages && pnpm --filter @agentaction/daemon build && pnpm --filter @agentaction/desktop build && pnpm --filter @agentaction/relay build",
     "typecheck": "pnpm build:packages && pnpm --filter @agentaction/daemon typecheck && pnpm --filter @agentaction/desktop typecheck && pnpm --filter @agentaction/relay typecheck",

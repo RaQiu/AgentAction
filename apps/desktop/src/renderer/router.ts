@@ -6,6 +6,7 @@ import RolesPage from "./pages/RolesPage.vue";
 import EquipmentPage from "./pages/EquipmentPage.vue";
 import RuntimesPage from "./pages/RuntimesPage.vue";
 import AssetsPage from "./pages/AssetsPage.vue";
+import SettingsPage from "./pages/SettingsPage.vue";
 
 export const router = createRouter({
   history: createWebHashHistory(),
@@ -44,6 +45,11 @@ export const router = createRouter({
       path: "/assets",
       name: "assets",
       component: AssetsPage
+    },
+    {
+      path: "/settings",
+      name: "settings",
+      component: SettingsPage
     }
   ]
 });

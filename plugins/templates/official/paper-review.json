@@ -1,0 +1,6 @@
+{
+  "id": "tpl_paper_word_review",
+  "title": "帮我阅读论文并生成带批注的 Word",
+  "tagline": "把论文和参考文献吃透，再给我一个可手改的带批注文档。",
+  "templateType": "official-task-card"
+}

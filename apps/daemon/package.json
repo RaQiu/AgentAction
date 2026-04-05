@@ -5,6 +5,7 @@
   "main": "dist/server.js",
   "dependencies": {
     "@agentaction/plugin-core": "workspace:*",
+    "@agentaction/provider-core": "workspace:*",
     "@agentaction/runtime-core": "workspace:*",
     "@agentaction/shared": "workspace:*",
     "@agentaction/task-engine": "workspace:*",

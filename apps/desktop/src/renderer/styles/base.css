@@ -31,7 +31,8 @@ a {
 }
 
 button,
-textarea {
+textarea,
+select {
   font: inherit;
 }
 
@@ -363,13 +364,18 @@ textarea {
 }
 
 .composer textarea,
-.import-area {
+.import-area,
+.select {
   width: 100%;
-  min-height: 120px;
   padding: 14px 16px;
   border-radius: 18px;
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.8);
+}
+
+.composer textarea,
+.import-area {
+  min-height: 120px;
   resize: vertical;
 }
 

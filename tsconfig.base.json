@@ -21,6 +21,9 @@
       "@agentaction/plugin-core": [
         "packages/plugin-core/src/index.ts"
       ],
+      "@agentaction/provider-core": [
+        "packages/provider-core/src/index.ts"
+      ],
       "@agentaction/runtime-core": [
         "packages/runtime-core/src/index.ts"
       ]

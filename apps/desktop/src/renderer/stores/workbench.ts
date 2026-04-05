@@ -22,6 +22,7 @@ export const useWorkbenchStore = defineStore("workbench", () => {
   const roles = computed(() => bootstrap.value?.roles ?? []);
   const equipment = computed(() => bootstrap.value?.equipment ?? []);
   const runtimes = computed(() => bootstrap.value?.runtimes ?? []);
+  const providers = computed(() => bootstrap.value?.providers ?? []);
   const tasks = computed(() => bootstrap.value?.tasks ?? []);
   const assets = computed<AssetRecord[]>(() => bootstrap.value?.assets ?? []);
   const pluginInventory = computed(
@@ -253,6 +254,7 @@ export const useWorkbenchStore = defineStore("workbench", () => {
     roles,
     equipment,
     runtimes,
+    providers,
     tasks,
     assets,
     pluginInventory,

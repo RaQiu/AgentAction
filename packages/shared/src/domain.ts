@@ -27,6 +27,8 @@ export type RuntimeSupportMode = "deep" | "enhanced" | "basic";
 
 export type RuntimeSource = "existing-install" | "cloned-source" | "dist-hack";
 
+export type ModelProviderKind = "remote" | "ollama" | "ktransformers";
+
 export type EventType =
   | "task.created"
   | "task.state.changed"
@@ -207,9 +209,20 @@ export interface AppBootstrap {
   roles: Role[];
   equipment: EquipmentPlugin[];
   runtimes: RuntimePlugin[];
+  providers: ProviderConfig[];
   tasks: Task[];
   assets: AssetRecord[];
   pluginInventory: PluginInventory;
+}
+
+export interface ProviderConfig {
+  id: string;
+  kind: ModelProviderKind;
+  name: string;
+  enabled: boolean;
+  role: string;
+  proxyMode: "split-by-target" | "direct-only" | "system";
+  note: string;
 }
 
 export interface PluginDirectoryEntry {

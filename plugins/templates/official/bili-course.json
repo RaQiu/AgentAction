@@ -1,0 +1,6 @@
+{
+  "id": "tpl_bili_course_notes",
+  "title": "帮我从 Bilibili 找课并生成字幕和笔记",
+  "tagline": "找课、抓音频、转文字、做结构化笔记，一次走完。",
+  "templateType": "official-task-card"
+}

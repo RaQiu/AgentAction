@@ -15,6 +15,7 @@
         <RouterLink to="/equipment" class="nav__item">装备库</RouterLink>
         <RouterLink to="/runtimes" class="nav__item">运行时</RouterLink>
         <RouterLink to="/assets" class="nav__item">结果与资产</RouterLink>
+        <RouterLink to="/settings" class="nav__item">设置</RouterLink>
       </nav>
 
       <div class="sidebar__footer">
