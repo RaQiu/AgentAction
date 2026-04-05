@@ -1,0 +1,9 @@
+{
+  "args": [
+    "-y",
+    "@upstash/context7-mcp"
+  ],
+  "command": "npx",
+  "startup_timeout_sec": 600,
+  "type": "stdio"
+}

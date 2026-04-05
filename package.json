@@ -1,0 +1,30 @@
+{
+  "name": "agentaction",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.24.0",
+  "scripts": {
+    "build:packages": "pnpm --filter @agentaction/shared build && pnpm --filter @agentaction/runtime-core build && pnpm --filter @agentaction/plugin-core build && pnpm --filter @agentaction/task-engine build",
+    "dev": "pnpm build:packages && concurrently -k \"pnpm --filter @agentaction/daemon dev\" \"pnpm --filter @agentaction/desktop dev\"",
+    "build": "pnpm build:packages && pnpm --filter @agentaction/daemon build && pnpm --filter @agentaction/desktop build && pnpm --filter @agentaction/relay build",
+    "typecheck": "pnpm build:packages && pnpm --filter @agentaction/daemon typecheck && pnpm --filter @agentaction/desktop typecheck && pnpm --filter @agentaction/relay typecheck",
+    "package:desktop": "pnpm build && pnpm --filter @agentaction/desktop dist"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "electron",
+      "electron-winstaller",
+      "esbuild"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.1",
+    "concurrently": "^9.2.1",
+    "rimraf": "^6.0.1",
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "wait-on": "^9.0.1"
+  }
+}

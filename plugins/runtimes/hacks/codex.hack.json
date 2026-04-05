@@ -1,0 +1,6 @@
+{
+  "id": "runtime_hack_codex_cli",
+  "targetRuntime": "codex",
+  "mode": "hack",
+  "notes": "通过 wrapper 和 stdout/stderr 劫持接入已有安装。"
+}

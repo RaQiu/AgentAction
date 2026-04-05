@@ -1,0 +1,12 @@
+node_modules
+dist
+dist-electron
+dist-renderer
+.DS_Store
+*.log
+coverage
+.turbo
+apps/desktop/out
+apps/desktop/release
+apps/daemon/.agentaction-data
+*.tsbuildinfo

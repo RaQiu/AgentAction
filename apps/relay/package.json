@@ -1,0 +1,17 @@
+{
+  "name": "@agentaction/relay",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.4",
+    "@types/node": "^24.9.1"
+  },
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "build": "tsup src/server.ts --format cjs --clean",
+    "typecheck": "tsc --noEmit"
+  }
+}

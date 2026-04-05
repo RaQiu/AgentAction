@@ -1,0 +1,6 @@
+{
+  "id": "runtime_clone_openclaw",
+  "targetRuntime": "openclaw",
+  "mode": "clone",
+  "notes": "保留源码 clone 并接管的接入能力。"
+}

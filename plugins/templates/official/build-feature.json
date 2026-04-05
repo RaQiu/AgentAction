@@ -1,0 +1,6 @@
+{
+  "id": "tpl_build_feature",
+  "title": "帮我开发程序并自动检修直到真正完毕",
+  "tagline": "先采访清楚，再结对开发、反复打回，直到能运行、能交付。",
+  "templateType": "official-task-card"
+}

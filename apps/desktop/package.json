@@ -1,0 +1,48 @@
+{
+  "name": "@agentaction/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist-electron/main.js",
+  "dependencies": {
+    "@agentaction/shared": "workspace:*",
+    "pinia": "^3.0.3",
+    "vue": "^3.5.22",
+    "vue-router": "^4.6.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.1",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "electron": "^37.2.6",
+    "electron-builder": "^26.0.12",
+    "vite": "^5.4.21",
+    "vue-tsc": "^3.1.1"
+  },
+  "scripts": {
+    "dev": "concurrently -k \"vite\" \"wait-on http://127.0.0.1:5173 && electron .\"",
+    "build:renderer": "vite build",
+    "build:main": "tsc -p tsconfig.main.json",
+    "build": "pnpm run build:renderer && pnpm run build:main",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.main.json",
+    "dist": "pnpm run build && electron-builder"
+  },
+  "build": {
+    "appId": "com.agentaction.desktop",
+    "files": [
+      "dist-renderer/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../daemon/dist",
+        "to": "daemon"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  }
+}
