@@ -94,6 +94,7 @@ export interface Role {
   currentEquipmentIds: string[];
   cloneLineageId: string;
   cloneSourceRoleId?: string;
+  isClone?: boolean;
   projectExperienceSkillIds: string[];
   notes?: string;
 }
@@ -208,6 +209,20 @@ export interface AppBootstrap {
   runtimes: RuntimePlugin[];
   tasks: Task[];
   assets: AssetRecord[];
+  pluginInventory: PluginInventory;
+}
+
+export interface PluginDirectoryEntry {
+  name: string;
+  relativePath: string;
+  containerType: "file" | "folder";
+  family: "skills" | "mcp" | "hacks" | "clones" | "adapters" | "templates";
+}
+
+export interface PluginInventory {
+  equipmentFiles: PluginDirectoryEntry[];
+  runtimeFiles: PluginDirectoryEntry[];
+  templateFiles: PluginDirectoryEntry[];
 }
 
 export interface EventEnvelope<T = Record<string, unknown>> {

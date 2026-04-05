@@ -4,6 +4,7 @@ import {
   type AssetRecord,
   type Conversation,
   type EventEnvelope,
+  type PluginDirectoryEntry,
   type QueuedMessage,
   type Role,
   type RoleSelection,
@@ -32,6 +33,7 @@ import {
   submitForReview
 } from "@agentaction/task-engine";
 import { previewImport } from "@agentaction/plugin-core";
+import { scanPluginDirectory } from "@agentaction/plugin-core";
 import { LocalDatabase } from "./db";
 import { buildCollectingReply, buildReviewSummary, buildRunningReply } from "./simulate";
 
@@ -79,7 +81,8 @@ export class AppStore {
       equipment: this.db.list("equipment"),
       runtimes: this.db.list("runtimes"),
       tasks,
-      assets
+      assets,
+      pluginInventory: this.scanPluginInventory()
     };
   }
 
@@ -124,6 +127,14 @@ export class AppStore {
     const task = this.getTask(taskId);
     const template = this.db.get<TaskTemplatePlugin>("templates", task.templateId ?? "");
     const roles = this.db.list<Role>("roles");
+    const trimmed = content.trim();
+
+    if (trimmed.startsWith("/btw ")) {
+      createExplicitBranch(task, trimmed);
+      addAssistantEvent(task, "系统", "已根据显式 /btw 指令打开旁枝。");
+      this.saveTask(task, "conversation.branch.opened", { taskId, prompt: trimmed });
+      return task;
+    }
 
     addUserMessage(task, content, authorLabel);
 
@@ -254,6 +265,76 @@ export class AppStore {
 
   previewImport(content: string) {
     return previewImport(content);
+  }
+
+  cloneRole(roleId: string): Role {
+    const role = this.db.get<Role>("roles", roleId);
+
+    if (!role) {
+      throw new Error("Role not found");
+    }
+
+    const cloneIndex =
+      this.db.list<Role>("roles").filter((item) => item.cloneLineageId === role.cloneLineageId).length + 1;
+
+    const clone: Role = {
+      ...role,
+      id: createId("role"),
+      displayName: `${role.displayName}·分身${cloneIndex}`,
+      nickname: `${role.nickname}${cloneIndex}`,
+      cloneSourceRoleId: role.id,
+      isClone: true,
+      statusLabel: "待派遣"
+    };
+
+    this.db.upsert("roles", clone, nowIso());
+    return clone;
+  }
+
+  syncCloneBack(roleId: string): { clone: Role; source: Role } {
+    const clone = this.db.get<Role>("roles", roleId);
+
+    if (!clone?.cloneSourceRoleId) {
+      throw new Error("Only cloned roles can sync back");
+    }
+
+    const source = this.db.get<Role>("roles", clone.cloneSourceRoleId);
+
+    if (!source) {
+      throw new Error("Clone source not found");
+    }
+
+    source.projectExperienceSkillIds = Array.from(
+      new Set([...source.projectExperienceSkillIds, ...clone.projectExperienceSkillIds])
+    );
+    source.notes = `${source.notes ?? ""}\n已从 ${clone.displayName} 手动回流经验。`.trim();
+
+    this.db.upsert("roles", source, nowIso());
+    return { clone, source };
+  }
+
+  private scanPluginInventory() {
+    const toEntries = (
+      dir: string,
+      family: PluginDirectoryEntry["family"]
+    ): PluginDirectoryEntry[] =>
+      scanPluginDirectory(dir).map((entry) => ({
+        ...entry,
+        family
+      }));
+
+    return {
+      equipmentFiles: [
+        ...toEntries(path.join(this.workspaceRoot, "plugins/equipment/skills"), "skills"),
+        ...toEntries(path.join(this.workspaceRoot, "plugins/equipment/mcp"), "mcp")
+      ],
+      runtimeFiles: [
+        ...toEntries(path.join(this.workspaceRoot, "plugins/runtimes/hacks"), "hacks"),
+        ...toEntries(path.join(this.workspaceRoot, "plugins/runtimes/clones"), "clones"),
+        ...toEntries(path.join(this.workspaceRoot, "plugins/runtimes/adapters"), "adapters")
+      ],
+      templateFiles: toEntries(path.join(this.workspaceRoot, "plugins/templates/official"), "templates")
+    };
   }
 
   private saveTask(task: Task, eventType: EventEnvelope["type"], payload: unknown): void {

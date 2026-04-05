@@ -1,4 +1,4 @@
-import type { AppBootstrap, Task } from "@agentaction/shared";
+import type { AppBootstrap, Role, Task } from "@agentaction/shared";
 
 const BASE_URL = "http://127.0.0.1:4318";
 
@@ -95,6 +95,16 @@ export const api = {
     return request<Record<string, unknown>>("/api/import/preview", {
       method: "POST",
       body: JSON.stringify({ content })
+    });
+  },
+  cloneRole(roleId: string) {
+    return request<Role>(`/api/roles/${roleId}/clone`, {
+      method: "POST"
+    });
+  },
+  syncCloneBack(roleId: string) {
+    return request<{ clone: Role; source: Role }>(`/api/roles/${roleId}/sync-back`, {
+      method: "POST"
     });
   },
   createSocket() {

@@ -1,7 +1,10 @@
 {
   "name": "@agentaction/desktop",
+  "productName": "AgentActionDesktop",
   "version": "0.1.0",
   "private": true,
+  "description": "Local-first multi-agent task workbench desktop client",
+  "author": "AgentAction",
   "main": "dist-electron/main.js",
   "dependencies": {
     "@agentaction/shared": "workspace:*",
@@ -27,6 +30,7 @@
   },
   "build": {
     "appId": "com.agentaction.desktop",
+    "artifactName": "AgentActionDesktop-${version}-${arch}.${ext}",
     "files": [
       "dist-renderer/**/*",
       "dist-electron/**/*",

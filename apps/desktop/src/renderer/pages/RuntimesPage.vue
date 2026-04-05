@@ -24,6 +24,21 @@
           <li><strong>能力</strong><span>{{ runtime.capabilities.join("、") }}</span></li>
         </ul>
       </article>
+
+      <article class="card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">运行时插件目录</p>
+            <h3>clone / hack 不进装备栏，只在平台接入层出现</h3>
+          </div>
+        </div>
+        <ul class="list">
+          <li v-for="entry in pluginInventory.runtimeFiles" :key="entry.relativePath">
+            <strong>{{ entry.name }}</strong>
+            <span>{{ entry.family }} · {{ entry.containerType }}</span>
+          </li>
+        </ul>
+      </article>
     </section>
   </section>
 </template>
@@ -39,4 +54,5 @@ onMounted(() => {
 });
 
 const runtimes = computed(() => store.runtimes);
+const pluginInventory = computed(() => store.pluginInventory);
 </script>

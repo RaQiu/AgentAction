@@ -24,6 +24,14 @@ export const useWorkbenchStore = defineStore("workbench", () => {
   const runtimes = computed(() => bootstrap.value?.runtimes ?? []);
   const tasks = computed(() => bootstrap.value?.tasks ?? []);
   const assets = computed<AssetRecord[]>(() => bootstrap.value?.assets ?? []);
+  const pluginInventory = computed(
+    () =>
+      bootstrap.value?.pluginInventory ?? {
+        equipmentFiles: [],
+        runtimeFiles: [],
+        templateFiles: []
+      }
+  );
 
   function upsertTask(task: Task): void {
     if (!bootstrap.value) {
@@ -209,6 +217,36 @@ export const useWorkbenchStore = defineStore("workbench", () => {
     upsertTask(task);
   }
 
+  async function cloneRole(roleId: string): Promise<void> {
+    await ensureInitialized();
+    const clone = await api.cloneRole(roleId);
+
+    if (!bootstrap.value) {
+      return;
+    }
+
+    bootstrap.value = {
+      ...bootstrap.value,
+      roles: [clone, ...bootstrap.value.roles]
+    };
+  }
+
+  async function syncCloneBack(roleId: string): Promise<void> {
+    await ensureInitialized();
+    const payload = await api.syncCloneBack(roleId);
+
+    if (!bootstrap.value) {
+      return;
+    }
+
+    bootstrap.value = {
+      ...bootstrap.value,
+      roles: bootstrap.value.roles.map((role) =>
+        role.id === payload.source.id ? payload.source : role
+      )
+    };
+  }
+
   return {
     bootstrap,
     templates,
@@ -217,6 +255,7 @@ export const useWorkbenchStore = defineStore("workbench", () => {
     runtimes,
     tasks,
     assets,
+    pluginInventory,
     currentTask,
     loading,
     errorMessage,
@@ -235,6 +274,8 @@ export const useWorkbenchStore = defineStore("workbench", () => {
     finishTask,
     reopenTask,
     shareTask,
-    extract
+    extract,
+    cloneRole,
+    syncCloneBack
   };
 });

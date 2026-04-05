@@ -39,6 +39,21 @@
 
         <pre v-if="previewResult" class="preview-box">{{ JSON.stringify(previewResult, null, 2) }}</pre>
       </article>
+
+      <article class="card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">文件夹插件</p>
+            <h3>单文件和文件夹都能作为装备载体</h3>
+          </div>
+        </div>
+        <ul class="list">
+          <li v-for="entry in pluginInventory.equipmentFiles" :key="entry.relativePath">
+            <strong>{{ entry.name }}</strong>
+            <span>{{ entry.family }} · {{ entry.containerType }}</span>
+          </li>
+        </ul>
+      </article>
     </section>
   </section>
 </template>
@@ -65,6 +80,7 @@ onMounted(() => {
 });
 
 const equipment = computed(() => store.equipment);
+const pluginInventory = computed(() => store.pluginInventory);
 
 async function preview() {
   previewResult.value = await api.previewImport(importText.value);

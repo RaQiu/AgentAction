@@ -8,7 +8,14 @@
     </header>
 
     <div class="role-stack">
-      <RoleCard v-for="role in roles" :key="role.id" :role="role" />
+      <RoleCard
+        v-for="role in roles"
+        :key="role.id"
+        :role="role"
+        show-actions
+        @clone="cloneRole"
+        @sync-back="syncRole"
+      />
     </div>
   </section>
 </template>
@@ -25,4 +32,12 @@ onMounted(() => {
 });
 
 const roles = computed(() => store.roles);
+
+async function cloneRole(roleId: string) {
+  await store.cloneRole(roleId);
+}
+
+async function syncRole(roleId: string) {
+  await store.syncCloneBack(roleId);
+}
 </script>

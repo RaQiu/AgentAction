@@ -209,6 +209,22 @@ app.post("/api/import/preview", (req, res) => {
   }
 });
 
+app.post("/api/roles/:roleId/clone", (req, res) => {
+  try {
+    res.status(201).json(store.cloneRole(req.params.roleId));
+  } catch (error) {
+    res.status(400).json({ message: (error as Error).message });
+  }
+});
+
+app.post("/api/roles/:roleId/sync-back", (req, res) => {
+  try {
+    res.json(store.syncCloneBack(req.params.roleId));
+  } catch (error) {
+    res.status(400).json({ message: (error as Error).message });
+  }
+});
+
 wsServer.on("connection", (socket) => {
   socket.send(
     JSON.stringify({
