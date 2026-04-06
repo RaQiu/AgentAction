@@ -112,8 +112,8 @@ const officialEquipment: EquipmentPlugin[] = [
 const officialRoles: Role[] = [
   {
     id: "role_product_xiaoce",
-    displayName: "🐎 产品经理",
-    nickname: "🐎",
+    displayName: "🐮 产品经理",
+    nickname: "🐮",
     profession: "product",
     persona: "负责追问需求、判断交付标准、决定是否打回。",
     avatar: {
@@ -143,8 +143,8 @@ const officialRoles: Role[] = [
   },
   {
     id: "role_engineer_ache",
-    displayName: "🐮 程序员",
-    nickname: "🐮",
+    displayName: "🐎 程序员",
+    nickname: "🐎",
     profession: "engineer",
     persona: "负责实现、调试、修复，并持续把东西做出来。",
     avatar: {
@@ -192,8 +192,8 @@ const officialTemplates: TaskTemplatePlugin[] = [
     outcomeTitle: "带批注 Word 主结果卡",
     scenarioSteps: [
       "角色先确认论文文件和参考文献是否齐备",
-      "🐮 先整理论文与参考资料",
-      "🐎 收束修改意见并生成带批注 Word"
+      "🐎 先整理论文与参考资料",
+      "🐮 收束修改意见并生成带批注 Word"
     ]
   },
   {
@@ -211,8 +211,8 @@ const officialTemplates: TaskTemplatePlugin[] = [
     requiredMaterials: ["课程主题关键词或链接", "偏好难度或时长", "笔记偏好格式"],
     outcomeTitle: "课程笔记主结果卡",
     scenarioSteps: [
-      "🐎 先确认课程目标和筛选标准",
-      "🐮 继续抓取素材并整理成字幕和笔记"
+      "🐮 先确认课程目标和筛选标准",
+      "🐎 继续抓取素材并整理成字幕和笔记"
     ]
   },
   {
@@ -229,8 +229,8 @@ const officialTemplates: TaskTemplatePlugin[] = [
     requiredMaterials: ["电子书文件夹路径", "学习目标", "每周可投入时间"],
     outcomeTitle: "学习规划主结果卡",
     scenarioSteps: [
-      "🐎 先确认书单和学习目标",
-      "🐮 逐本整理重点并输出总结与学习规划"
+      "🐮 先确认书单和学习目标",
+      "🐎 逐本整理重点并输出总结与学习规划"
     ]
   },
   {

@@ -216,10 +216,10 @@ function messageAuthorLabel(authorLabel: string): string {
   if (authorLabel.startsWith("Codex·工具")) {
     return `Codex · ${t("task.toolLabel")}`;
   }
-  if (authorLabel === "🐎 产品经理") {
+  if (authorLabel === "🐮 产品经理") {
     return roleDisplayName("role_product_xiaoce", authorLabel);
   }
-  if (authorLabel === "🐮 程序员") {
+  if (authorLabel === "🐎 程序员") {
     return roleDisplayName("role_engineer_ache", authorLabel);
   }
   return authorLabel;

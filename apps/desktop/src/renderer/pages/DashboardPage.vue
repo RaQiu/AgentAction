@@ -18,14 +18,14 @@
 
         <div class="launch-stage__roles">
           <div class="launch-stage__role">
-            <span class="launch-stage__avatar">🐎</span>
+            <span class="launch-stage__avatar">🐮</span>
             <div>
               <strong>{{ t("home.roleProduct") }}</strong>
               <span>{{ t("task.requestReview") }}</span>
             </div>
           </div>
           <div class="launch-stage__role">
-            <span class="launch-stage__avatar">🐮</span>
+            <span class="launch-stage__avatar">🐎</span>
             <div>
               <strong>{{ t("home.roleEngineer") }}</strong>
               <span>{{ t("home.running") }}</span>

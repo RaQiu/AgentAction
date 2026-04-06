@@ -412,15 +412,15 @@ const uiCopy: Record<AppLocale, UiCopy> = {
 const roleCopy: Record<string, Partial<Record<AppLocale, { displayName: string; persona: string; nickname: string }>>> = {
   role_product_xiaoce: {
     "en-US": {
-      displayName: "🐎 Product Manager",
-      nickname: "🐎",
+      displayName: "🐮 Product Manager",
+      nickname: "🐮",
       persona: "Clarifies the goal, reviews the work, and decides whether it goes back."
     }
   },
   role_engineer_ache: {
     "en-US": {
-      displayName: "🐮 Programmer",
-      nickname: "🐮",
+      displayName: "🐎 Programmer",
+      nickname: "🐎",
       persona: "Builds, fixes, and keeps pushing the task toward delivery."
     }
   }
