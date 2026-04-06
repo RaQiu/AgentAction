@@ -449,7 +449,7 @@ strong {
   min-height: calc(100vh - 38px);
   padding: 26px 30px;
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr);
+  grid-template-columns: minmax(0, 1.08fr) minmax(400px, 0.92fr);
   gap: 26px;
   align-items: center;
 }
@@ -458,7 +458,7 @@ strong {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-width: 38rem;
+  max-width: 44rem;
 }
 
 .launch-hero__copy h1 {
@@ -466,14 +466,14 @@ strong {
   font-size: clamp(2rem, 3vw, 3rem);
   line-height: 1.08;
   letter-spacing: -0.04em;
-  max-width: 14ch;
+  max-width: 17ch;
   white-space: pre-line;
 }
 
 .launch-hero__copy .page__lead {
   font-size: 1rem;
   line-height: 1.55;
-  max-width: 28rem;
+  max-width: 34rem;
 }
 
 .launch-hero__actions {
