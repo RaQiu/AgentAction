@@ -83,7 +83,15 @@ export interface RuntimePlugin {
   githubUrl?: string;
   installLabel?: string;
   installMode?: "existing" | "clone";
+  supportsCloneInstall?: boolean;
   shallowClone?: boolean;
+  probeArgs?: string[];
+  checkState?: "unknown" | "passed" | "partial" | "failed";
+  checkSummary?: string;
+  checkDetails?: string[];
+  detectedCommandPath?: string;
+  detectedVersion?: string;
+  lastCheckedAt?: string;
   capabilities: string[];
   status: "ready" | "degraded" | "missing";
 }

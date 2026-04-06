@@ -217,6 +217,14 @@ app.post("/api/runtimes/:runtimeId/install-source", (req, res) => {
   }
 });
 
+app.post("/api/runtimes/:runtimeId/check", (req, res) => {
+  try {
+    res.json(store.checkRuntime(req.params.runtimeId));
+  } catch (error) {
+    res.status(400).json({ message: (error as Error).message });
+  }
+});
+
 app.post("/api/roles/:roleId/clone", (req, res) => {
   try {
     res.status(201).json(store.cloneRole(req.params.roleId));

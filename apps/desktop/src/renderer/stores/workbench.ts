@@ -265,6 +265,22 @@ export const useWorkbenchStore = defineStore("workbench", () => {
     };
   }
 
+  async function checkRuntime(runtimeId: string): Promise<void> {
+    await ensureInitialized();
+    const runtime = await api.checkRuntime(runtimeId);
+
+    if (!bootstrap.value) {
+      return;
+    }
+
+    bootstrap.value = {
+      ...bootstrap.value,
+      runtimes: bootstrap.value.runtimes.map((item) =>
+        item.id === runtime.id ? runtime : item
+      )
+    };
+  }
+
   return {
     bootstrap,
     templates,
@@ -296,6 +312,7 @@ export const useWorkbenchStore = defineStore("workbench", () => {
     extract,
     cloneRole,
     syncCloneBack,
-    installRuntimeFromGitHub
+    installRuntimeFromGitHub,
+    checkRuntime
   };
 });

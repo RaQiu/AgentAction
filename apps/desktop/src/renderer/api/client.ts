@@ -112,6 +112,11 @@ export const api = {
       method: "POST"
     });
   },
+  checkRuntime(runtimeId: string) {
+    return request<RuntimePlugin>(`/api/runtimes/${runtimeId}/check`, {
+      method: "POST"
+    });
+  },
   createSocket() {
     return new WebSocket("ws://127.0.0.1:4318/ws");
   }

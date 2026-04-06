@@ -21,18 +21,27 @@
         <ul class="list">
           <li><strong>目标运行时</strong><span>{{ runtime.targetRuntime }}</span></li>
           <li><strong>来源</strong><span>{{ runtime.source }}</span></li>
+          <li v-if="runtime.checkSummary"><strong>检查摘要</strong><span>{{ runtime.checkSummary }}</span></li>
+          <li v-if="runtime.detectedCommandPath"><strong>命令路径</strong><span>{{ runtime.detectedCommandPath }}</span></li>
+          <li v-if="runtime.detectedVersion"><strong>命令输出</strong><span>{{ runtime.detectedVersion }}</span></li>
           <li v-if="runtime.githubUrl"><strong>GitHub</strong><a :href="runtime.githubUrl" target="_blank" rel="noreferrer">{{ runtime.githubUrl }}</a></li>
           <li v-if="runtime.pathHint"><strong>接入路径</strong><span>{{ runtime.pathHint }}</span></li>
           <li><strong>能力</strong><span>{{ runtime.capabilities.join("、") }}</span></li>
         </ul>
         <div class="composer__actions">
-          <button v-if="runtime.installMode === 'clone'" class="button button--primary" @click="installClone(runtime.id)">
+          <button class="button button--ghost" @click="check(runtime.id)">真实检查</button>
+          <button v-if="runtime.installMode === 'clone' || runtime.supportsCloneInstall" class="button button--primary" @click="installClone(runtime.id)">
             一键 clone 接入
           </button>
           <a v-if="runtime.githubUrl" class="button button--ghost" :href="runtime.githubUrl" target="_blank" rel="noreferrer">
             打开 GitHub
           </a>
         </div>
+        <ul v-if="runtime.checkDetails?.length" class="list">
+          <li v-for="detail in runtime.checkDetails" :key="detail">
+            <span>{{ detail }}</span>
+          </li>
+        </ul>
         <p v-if="runtime.installLabel" class="muted">{{ runtime.installLabel }}</p>
       </article>
 
@@ -69,5 +78,9 @@ const pluginInventory = computed(() => store.pluginInventory);
 
 async function installClone(runtimeId: string) {
   await store.installRuntimeFromGitHub(runtimeId);
+}
+
+async function check(runtimeId: string) {
+  await store.checkRuntime(runtimeId);
 }
 </script>

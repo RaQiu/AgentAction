@@ -41,6 +41,43 @@ import { scanPluginDirectory } from "@agentaction/plugin-core";
 import { LocalDatabase } from "./db";
 import { buildCollectingReply, buildReviewSummary, buildRunningReply } from "./simulate";
 
+function commandLocatorForCurrentOs(): { command: string; args: (binary: string) => string[] } {
+  if (process.platform === "win32") {
+    return {
+      command: "where",
+      args: (binary) => [binary]
+    };
+  }
+
+  return {
+    command: "which",
+    args: (binary) => [binary]
+  };
+}
+
+function firstNonEmptyLine(value: string): string | undefined {
+  return value
+    .split("\n")
+    .map((line) => line.trim())
+    .find(Boolean);
+}
+
+function repoLooksRunnable(targetDir: string): string[] {
+  const candidatePaths = [
+    "package.json",
+    "pyproject.toml",
+    "Cargo.toml",
+    "go.mod",
+    "requirements.txt",
+    "README.md",
+    "src/main.py",
+    "src/setup.py",
+    "rust/Cargo.toml"
+  ];
+
+  return candidatePaths.filter((signal) => fs.existsSync(path.join(targetDir, signal)));
+}
+
 export class AppStore {
   private readonly db: LocalDatabase;
   private readonly stateRoot: string;
@@ -66,9 +103,25 @@ export class AppStore {
       this.db.upsert("equipment", equipment, nowIso())
     );
 
-    getOfficialRuntimePlugins().forEach((runtime) =>
-      this.db.upsert("runtimes", runtime, nowIso())
-    );
+    getOfficialRuntimePlugins().forEach((runtime) => {
+      const existing = this.db.get<RuntimePlugin>("runtimes", runtime.id);
+      const merged: RuntimePlugin = existing
+        ? {
+            ...runtime,
+            source: existing.source,
+            status: existing.status,
+            pathHint: existing.pathHint ?? runtime.pathHint,
+            checkState: existing.checkState ?? runtime.checkState,
+            checkSummary: existing.checkSummary ?? runtime.checkSummary,
+            checkDetails: existing.checkDetails ?? runtime.checkDetails,
+            detectedCommandPath: existing.detectedCommandPath,
+            detectedVersion: existing.detectedVersion,
+            lastCheckedAt: existing.lastCheckedAt
+          }
+        : runtime;
+
+      this.db.upsert("runtimes", merged, nowIso());
+    });
 
     getDefaultProviders().forEach((provider) =>
       this.db.upsert("providers", provider, nowIso())
@@ -279,7 +332,7 @@ export class AppStore {
       throw new Error("Runtime not found");
     }
 
-    if (runtime.installMode !== "clone" || !runtime.githubUrl) {
+    if ((runtime.installMode !== "clone" && !runtime.supportsCloneInstall) || !runtime.githubUrl) {
       throw new Error("This runtime does not support GitHub clone install");
     }
 
@@ -309,8 +362,113 @@ export class AppStore {
 
     const updated: RuntimePlugin = {
       ...runtime,
+      source: "cloned-source",
       status: "ready",
-      pathHint: runtimeDir
+      pathHint: runtimeDir,
+      checkState: "partial",
+      checkSummary: "GitHub clone 已完成，等待进一步 hack/运行探测。",
+      checkDetails: [`已克隆到 ${runtimeDir}`],
+      lastCheckedAt: nowIso()
+    };
+
+    this.db.upsert("runtimes", updated, nowIso());
+    return updated;
+  }
+
+  checkRuntime(runtimeId: string): RuntimePlugin {
+    const runtime = this.db.get<RuntimePlugin>("runtimes", runtimeId);
+
+    if (!runtime) {
+      throw new Error("Runtime not found");
+    }
+
+    const details: string[] = [];
+    let existingPassed = false;
+    let clonePassed = false;
+    let detectedCommandPath = runtime.detectedCommandPath;
+    let detectedVersion = runtime.detectedVersion;
+
+    if (runtime.githubUrl) {
+      const remote = spawnSync("git", ["ls-remote", runtime.githubUrl, "HEAD"], {
+        cwd: this.workspaceRoot,
+        encoding: "utf-8"
+      });
+
+      if (remote.status === 0) {
+        details.push(`GitHub 可达：${firstNonEmptyLine(remote.stdout) ?? runtime.githubUrl}`);
+      } else {
+        details.push(`GitHub 不可达：${runtime.githubUrl}`);
+      }
+    }
+
+    if (runtime.command) {
+      const locator = commandLocatorForCurrentOs();
+      const locate = spawnSync(locator.command, locator.args(runtime.command), {
+        cwd: this.workspaceRoot,
+        encoding: "utf-8"
+      });
+
+      if (locate.status === 0) {
+        detectedCommandPath = firstNonEmptyLine(locate.stdout);
+        details.push(`命令存在：${detectedCommandPath}`);
+
+        const probe = spawnSync(runtime.command, runtime.probeArgs ?? ["--version"], {
+          cwd: this.workspaceRoot,
+          encoding: "utf-8"
+        });
+
+        const stdout = `${probe.stdout ?? ""}\n${probe.stderr ?? ""}`.trim();
+        if (probe.status === 0 || stdout.length > 0) {
+          existingPassed = true;
+          detectedVersion = firstNonEmptyLine(stdout) ?? detectedVersion;
+          details.push(`hack 探测通过：${detectedVersion ?? "已拿到命令输出"}`);
+        } else {
+          details.push(`hack 探测失败：命令可执行但没有拿到有效输出`);
+        }
+      } else {
+        details.push(`命令缺失：${runtime.command}`);
+      }
+    }
+
+    if (runtime.pathHint && fs.existsSync(runtime.pathHint)) {
+      const signals = repoLooksRunnable(runtime.pathHint);
+      if (signals.length > 0) {
+        clonePassed = true;
+        details.push(`clone 仓库有效：检测到 ${signals.join("、")}`);
+      } else {
+        details.push(`clone 仓库存在，但缺少常见项目入口文件`);
+      }
+    } else if (runtime.source === "cloned-source") {
+      details.push(`clone 路径缺失：${runtime.pathHint ?? "未记录路径"}`);
+    }
+
+    let checkState: RuntimePlugin["checkState"] = "failed";
+    let status: RuntimePlugin["status"] = "missing";
+    let checkSummary = "既没有通过 hack 检查，也没有通过 clone 检查。";
+
+    if (existingPassed && clonePassed) {
+      checkState = "passed";
+      status = "ready";
+      checkSummary = "hack 与 clone 检查都通过。";
+    } else if (existingPassed) {
+      checkState = "passed";
+      status = "ready";
+      checkSummary = "hack 注入探测通过。";
+    } else if (clonePassed) {
+      checkState = "partial";
+      status = "degraded";
+      checkSummary = "clone 检查通过，但 hack 注入尚未通过。";
+    }
+
+    const updated: RuntimePlugin = {
+      ...runtime,
+      detectedCommandPath,
+      detectedVersion,
+      checkState,
+      checkSummary,
+      checkDetails: details,
+      status,
+      lastCheckedAt: nowIso()
     };
 
     this.db.upsert("runtimes", updated, nowIso());
