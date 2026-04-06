@@ -4,35 +4,12 @@
       <div class="brand brand--stacked">
         <div class="brand__crest">
           <div class="brand__badge">AA</div>
-          <span class="brand__signal"></span>
         </div>
         <div class="brand__copy">
           <div class="brand__title">{{ t("app.name") }}</div>
           <div class="brand__subtitle">{{ t("app.subtitle") }}</div>
-          <p class="brand__summary">{{ t("app.summary") }}</p>
         </div>
       </div>
-
-      <section class="sidebar-cluster">
-        <div class="sidebar-cluster__header">
-          <p class="eyebrow">{{ t("shell.status") }}</p>
-          <span class="tag tag--live">{{ socketConnected ? t("shell.connected") : t("shell.connecting") }}</span>
-        </div>
-        <div class="sidebar-metrics">
-          <article class="sidebar-metric">
-            <strong>{{ tasks.length }}</strong>
-            <span>{{ t("shell.tasks") }}</span>
-          </article>
-          <article class="sidebar-metric">
-            <strong>{{ roles.length }}</strong>
-            <span>{{ t("shell.roles") }}</span>
-          </article>
-          <article class="sidebar-metric">
-            <strong>{{ activeRuntimeName }}</strong>
-            <span>{{ t("shell.defaultRuntime") }}</span>
-          </article>
-        </div>
-      </section>
 
       <nav class="nav">
         <RouterLink to="/" class="nav__item">{{ t("nav.dashboard") }}</RouterLink>
@@ -44,13 +21,15 @@
       </nav>
 
       <div class="sidebar__footer">
+        <div class="sidebar__status">
+          <span class="sidebar__status-dot" :class="{ 'sidebar__status-dot--on': socketConnected }"></span>
+          <span>{{ socketConnected ? t("shell.connected") : t("shell.connecting") }}</span>
+        </div>
         <p>{{ t("shell.footer", { runtime: activeRuntimeName }) }}</p>
       </div>
     </aside>
 
     <main class="shell__main">
-      <div class="shell__glow shell__glow--north"></div>
-      <div class="shell__glow shell__glow--east"></div>
       <slot />
     </main>
   </div>
@@ -69,8 +48,6 @@ onMounted(() => {
   store.ensureInitialized();
 });
 
-const tasks = computed(() => store.tasks);
-const roles = computed(() => store.roles);
 const socketConnected = computed(() => store.socketConnected);
 const activeRuntimeName = computed(() => {
   const runtime = store.runtimes.find((item) => item.id === store.settings?.defaultRuntimeId);

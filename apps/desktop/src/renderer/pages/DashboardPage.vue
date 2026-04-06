@@ -1,55 +1,122 @@
 <template>
   <section class="page">
-    <header class="control-hero">
-      <div class="control-hero__copy">
+    <header class="dashboard-header">
+      <div>
         <p class="eyebrow">{{ t("nav.dashboard") }}</p>
         <h1>{{ t("home.title") }}</h1>
         <p class="page__lead">{{ t("home.subtitle") }}</p>
-        <div class="hero-actions hero-actions--inline">
-          <RouterLink :to="firstTemplateRoute" class="button button--primary">{{ t("home.primaryCta") }}</RouterLink>
-        </div>
       </div>
+      <RouterLink :to="firstTemplateRoute" class="button button--primary">{{ t("home.primaryCta") }}</RouterLink>
+    </header>
 
-      <div class="control-hero__board">
-        <article class="control-hero__panel">
-          <p class="eyebrow">{{ t("home.overview") }}</p>
-          <div class="ops-grid">
-            <div class="ops-cell">
-              <strong>{{ tasks.length }}</strong>
-              <span>{{ t("shell.tasks") }}</span>
-            </div>
-            <div class="ops-cell">
-              <strong>{{ runningTasks }}</strong>
-              <span>{{ t("home.running") }}</span>
-            </div>
-            <div class="ops-cell">
-              <strong>{{ reviewTasks }}</strong>
-              <span>{{ t("home.review") }}</span>
-            </div>
-            <div class="ops-cell">
-              <strong>{{ defaultRuntimeName }}</strong>
-              <span>{{ t("home.defaultRuntimePanel") }}</span>
+    <section class="dashboard-workbench">
+      <article class="dashboard-panel dashboard-panel--summary">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">{{ t("home.overview") }}</p>
+            <h3>{{ latestTaskTitle }}</h3>
+          </div>
+          <span class="dashboard-status">{{ latestTask ? statusLabelMap[latestTask.status] : t("home.noTask") }}</span>
+        </div>
+
+        <dl class="dashboard-stats">
+          <div>
+            <dt>{{ t("shell.tasks") }}</dt>
+            <dd>{{ tasks.length }}</dd>
+          </div>
+          <div>
+            <dt>{{ t("home.running") }}</dt>
+            <dd>{{ runningTasks }}</dd>
+          </div>
+          <div>
+            <dt>{{ t("home.review") }}</dt>
+            <dd>{{ reviewTasks }}</dd>
+          </div>
+        </dl>
+
+        <ul class="dashboard-summary-list">
+          <li>
+            <strong>{{ t("shell.defaultRuntime") }}</strong>
+            <span>{{ defaultRuntimeName }}</span>
+          </li>
+          <li>
+            <strong>{{ t("task.contractTitle") }}</strong>
+            <span>{{ latestTask?.runtimeState?.pendingFinish?.resultTitle || "—" }}</span>
+          </li>
+        </ul>
+      </article>
+
+      <article class="dashboard-panel dashboard-panel--focus">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Battle</p>
+            <h3>{{ latestTaskTitle }}</h3>
+          </div>
+          <span class="focus-badge">{{ t("home.runtimeReady") }}</span>
+        </div>
+
+        <div class="focus-roles">
+          <div class="focus-role">
+            <span class="focus-role__avatar">🐎</span>
+            <div>
+              <strong>产品经理</strong>
+              <span>{{ t("task.requestReview") }}</span>
             </div>
           </div>
-        </article>
+          <div class="focus-role">
+            <span class="focus-role__avatar">🐮</span>
+            <div>
+              <strong>程序员</strong>
+              <span>{{ t("home.running") }}</span>
+            </div>
+          </div>
+        </div>
 
-        <article class="control-hero__panel control-hero__panel--log">
+        <ol class="battle-timeline">
+          <li class="battle-timeline__item battle-timeline__item--done">
+            <span class="battle-timeline__dot"></span>
+            <div>
+              <strong>接到任务</strong>
+              <p>{{ latestTaskTitle }}</p>
+            </div>
+          </li>
+          <li class="battle-timeline__item battle-timeline__item--done">
+            <span class="battle-timeline__dot"></span>
+            <div>
+              <strong>补齐资料</strong>
+              <p>{{ latestTask?.collectedMaterials?.length || 0 }} 项已记录</p>
+            </div>
+          </li>
+          <li class="battle-timeline__item battle-timeline__item--active">
+            <span class="battle-timeline__dot"></span>
+            <div>
+              <strong>结对 battle</strong>
+              <p>{{ latestTask?.runtimeState?.pendingFinish?.summary || "当前正在推进" }}</p>
+            </div>
+          </li>
+          <li class="battle-timeline__item">
+            <span class="battle-timeline__dot"></span>
+            <div>
+              <strong>准备交付</strong>
+              <p>{{ latestTask?.resultCard?.title || "等待结果" }}</p>
+            </div>
+          </li>
+        </ol>
+      </article>
+
+      <div class="dashboard-side">
+        <article class="dashboard-note">
           <p class="eyebrow">{{ t("home.defaultRuntimePanel") }}</p>
-          <ul class="watch-list">
-            <li>
-              <span class="watch-list__call">{{ defaultRuntimeReady ? "READY" : "CHECK" }}</span>
-              <strong>{{ defaultRuntimeName }}</strong>
-              <span>{{ defaultRuntimeReady ? t("home.runtimeReady") : t("home.runtimePending") }}</span>
-            </li>
-            <li>
-              <span class="watch-list__call">TASK</span>
-              <strong>{{ latestTasks[0]?.templateId ? templateField(latestTasks[0].templateId, "title", latestTasks[0].title) : (latestTasks[0]?.title || t("home.noTask")) }}</strong>
-              <span>{{ latestTasks[0] ? statusLabelMap[latestTasks[0].status] : t("home.noTaskDesc") }}</span>
-            </li>
-          </ul>
+          <strong>{{ defaultRuntimeName }}</strong>
+          <span>{{ defaultRuntimeReady ? t("home.runtimeReady") : t("home.runtimePending") }}</span>
+        </article>
+        <article class="dashboard-note">
+          <p class="eyebrow">{{ t("result.card") }}</p>
+          <strong>{{ latestTask?.resultCard?.title || "等待交付" }}</strong>
+          <span>{{ latestTask?.resultCard?.summary || "任务完成后会在这里出现。" }}</span>
         </article>
       </div>
-    </header>
+    </section>
 
     <section class="mission-section">
       <div class="section-heading section-heading--wide">
@@ -94,6 +161,14 @@ const tasks = computed(() => store.tasks);
 const runningTasks = computed(() => tasks.value.filter((task) => task.status === "running").length);
 const reviewTasks = computed(() => tasks.value.filter((task) => task.status === "review").length);
 const latestTasks = computed(() => tasks.value.slice(0, 4));
+const latestTask = computed(() => latestTasks.value[0]);
+const latestTaskTitle = computed(() => {
+  const task = latestTask.value;
+  if (!task) {
+    return t("home.noTask");
+  }
+  return task.templateId ? templateField(task.templateId, "title", task.title) : task.title;
+});
 const firstTemplateRoute = computed(() => `/templates/${templates.value[0]?.id ?? "tpl_build_feature"}`);
 const defaultRuntimeName = computed(() => {
   const runtime = runtimes.value.find((item) => item.id === store.settings?.defaultRuntimeId);

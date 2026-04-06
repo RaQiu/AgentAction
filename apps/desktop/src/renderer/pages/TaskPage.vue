@@ -5,7 +5,7 @@
         <p class="eyebrow">{{ t("shell.tasks") }}</p>
         <h1>{{ task.templateId ? templateField(task.templateId, "title", task.title) : task.title }}</h1>
         <p class="page__lead">
-          {{ statusLabelMap[task.status] }} · {{ t("task.runtime") }} {{ task.runtimeState?.runtimeId || "—" }} · {{ t("task.finishDiscipline") }} {{ task.finishRequired ? t("task.enabled") : t("task.disabled") }}
+          {{ statusLabelMap[task.status] }} · {{ t("task.runtime") }} {{ currentRuntimeName }} · {{ t("task.finishDiscipline") }} {{ task.finishRequired ? t("task.enabled") : t("task.disabled") }}
         </p>
       </div>
       <div class="hero-actions">
@@ -166,7 +166,7 @@ import { useWorkbenchStore } from "@/stores/workbench";
 
 const route = useRoute();
 const store = useWorkbenchStore();
-const { t, templateField } = useI18n();
+const { t, templateField, runtimeField } = useI18n();
 const messageText = ref("");
 
 const statusLabelMap: Record<TaskStatus, string> = {
@@ -181,6 +181,11 @@ onMounted(async () => {
 });
 
 const task = computed(() => store.currentTask);
+const currentRuntimeName = computed(() => {
+  const runtimeId = task.value?.runtimeState?.runtimeId;
+  const runtime = store.runtimes.find((item) => item.id === runtimeId);
+  return runtime ? runtimeField(runtime.id, "name", runtime.name) : "—";
+});
 
 function formatDate(value: string): string {
   return new Date(value).toLocaleString("zh-CN", {
