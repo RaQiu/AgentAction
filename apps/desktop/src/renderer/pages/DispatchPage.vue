@@ -6,54 +6,52 @@
         <h1>{{ templateField(template.id, "title", template.title) }}</h1>
         <p class="page__lead">{{ templateField(template.id, "description", template.description) }}</p>
       </div>
-      <button class="button button--primary" :disabled="submitting" @click="startTask">
-        {{ submitting ? t("dispatch.starting") : t("dispatch.start") }}
-      </button>
     </header>
 
-    <section class="setup-layout">
-      <article class="setup-panel setup-panel--main">
-        <div class="setup-block">
+    <article class="dispatch-sheet">
+      <div class="dispatch-sheet__main">
+        <section class="dispatch-sheet__section">
           <p class="eyebrow">{{ t("dispatch.roles") }}</p>
-          <h3>{{ t("dispatch.rolesSubtitle") }}</h3>
-          <ul class="setup-list">
+          <ul class="dispatch-sheet__list">
             <li v-for="role in recommendedRoles" :key="role.id">
               <strong>{{ roleDisplayName(role.id, role.displayName) }}</strong>
               <span>{{ rolePersona(role.id, role.persona) }}</span>
             </li>
           </ul>
-        </div>
+        </section>
 
-        <div class="setup-block">
+        <section class="dispatch-sheet__section">
           <p class="eyebrow">{{ t("dispatch.equipment") }}</p>
-          <h3>{{ t("dispatch.equipmentSubtitle") }}</h3>
-          <ul class="setup-list">
+          <ul class="dispatch-sheet__list">
             <li v-for="item in recommendedEquipment" :key="item.id">
               <strong>{{ item.name }}</strong>
-              <span>{{ item.slot }} · {{ item.kind }}</span>
+              <span>{{ item.description }}</span>
             </li>
           </ul>
-        </div>
-      </article>
+        </section>
+      </div>
 
-      <article class="setup-panel setup-panel--side">
-        <div class="setup-block">
+      <aside class="dispatch-sheet__side">
+        <section class="dispatch-sheet__section">
           <p class="eyebrow">{{ t("dispatch.materials") }}</p>
-          <h3>{{ t("dispatch.materialsSubtitle") }}</h3>
-          <ul class="setup-list">
-            <li v-for="item in templateField(template.id, 'requiredMaterials', template.requiredMaterials)" :key="item">
+          <ul class="dispatch-sheet__list">
+            <li
+              v-for="item in templateField(template.id, 'requiredMaterials', template.requiredMaterials)"
+              :key="item"
+            >
               <strong>{{ item }}</strong>
             </li>
           </ul>
-        </div>
-        <div class="setup-actions">
+        </section>
+
+        <div class="dispatch-sheet__actions">
           <span class="tag">{{ t("dispatch.recommendedOnly") }}</span>
           <button class="button button--primary" :disabled="submitting" @click="startTask">
             {{ submitting ? t("dispatch.starting") : t("dispatch.start") }}
           </button>
         </div>
-      </article>
-    </section>
+      </aside>
+    </article>
   </section>
 </template>
 

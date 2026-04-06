@@ -994,56 +994,9 @@ strong {
   gap: 4px;
 }
 
-.task-stage-grid {
+.task-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) 220px;
-  gap: 10px;
-}
-
-.task-stage {
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.88);
-}
-
-.task-stage--light {
-  background: linear-gradient(180deg, rgba(75, 137, 220, 0.06), rgba(255, 255, 255, 0.94));
-}
-
-.ops-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.ops-grid--compact {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.ops-cell {
-  min-height: 56px;
-  padding: 9px 10px;
-  border-radius: 10px;
-  background: var(--surface-soft);
-  border: 1px solid var(--line);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.ops-cell strong {
-  font-size: 0.88rem;
-}
-
-.ops-cell span {
-  color: var(--muted);
-  font-size: 0.74rem;
-}
-
-.task-grid {
-  display: grid;
-  grid-template-columns: 260px minmax(0, 1fr) 280px;
+  grid-template-columns: minmax(0, 1fr) 300px;
   gap: 12px;
   align-items: start;
 }
@@ -1055,10 +1008,19 @@ strong {
   padding: 14px;
 }
 
-.task-side {
+.workspace-panel--primary {
+  min-height: 620px;
+}
+
+.task-shell__side {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.mission-stack--result {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(245, 248, 253, 0.96));
+  border-color: rgba(75, 137, 220, 0.16);
 }
 
 .timeline {
@@ -1397,8 +1359,7 @@ strong {
 
 @media (max-width: 1280px) {
   .launch-hero,
-  .task-grid,
-  .task-stage-grid,
+  .task-shell,
   .setup-layout,
   .utility-layout,
   .onboarding-shell,
@@ -1431,7 +1392,6 @@ strong {
   }
 
   .template-grid,
-  .ops-grid--compact,
   .language-grid {
     grid-template-columns: 1fr;
   }

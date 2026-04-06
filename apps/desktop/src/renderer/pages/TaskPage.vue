@@ -4,9 +4,7 @@
       <div class="task-command__copy">
         <p class="eyebrow">{{ t("shell.tasks") }}</p>
         <h1>{{ task.templateId ? templateField(task.templateId, "title", task.title) : task.title }}</h1>
-        <p class="page__lead">
-          {{ statusLabel(task.status) }} · {{ t("task.runtime") }} {{ currentRuntimeName }} · {{ t("task.finishDiscipline") }} {{ task.finishRequired ? t("task.enabled") : t("task.disabled") }}
-        </p>
+        <p class="page__lead">{{ statusLabel(task.status) }}</p>
       </div>
       <div class="hero-actions">
         <button class="button button--ghost" @click="share">{{ t("task.share") }}</button>
@@ -16,46 +14,13 @@
       </div>
     </header>
 
-    <section class="task-stage-grid">
-      <article class="task-stage">
-        <p class="eyebrow">{{ t("task.status") }}</p>
-        <div class="ops-grid ops-grid--compact">
-          <div class="ops-cell">
-            <strong>{{ task.mainConversation.messages.length }}</strong>
-            <span>{{ t("task.events") }}</span>
-          </div>
-          <div class="ops-cell">
-            <strong>{{ task.runtimeState?.sessionId ? t("task.sessionReady") : t("task.sessionMissing") }}</strong>
-            <span>{{ t("task.session") }}</span>
-          </div>
-          <div class="ops-cell">
-            <strong>{{ task.runtimeState?.compactDetected ? t("task.compactSeen") : t("task.compactNone") }}</strong>
-            <span>{{ t("task.compact") }}</span>
-          </div>
-          <div class="ops-cell">
-            <strong>{{ task.runtimeState?.pendingFinish ? t("task.contractReady") : t("task.contractPending") }}</strong>
-            <span>{{ t("task.contract") }}</span>
-          </div>
-        </div>
-      </article>
-
-      <article class="task-stage task-stage--light">
-        <p class="eyebrow">{{ t("task.goal") }}</p>
-        <div class="task-stage__summary">
-          <strong>{{ t("result.card") }}</strong>
-          <span>{{ task.resultCard?.title || t("task.goalEmpty") }}</span>
-        </div>
-      </article>
-    </section>
-
-    <section class="task-grid">
-      <article class="workspace-panel">
+    <section class="task-shell">
+      <article class="workspace-panel workspace-panel--primary">
         <div class="section-heading">
           <div>
             <p class="eyebrow">{{ t("task.workspace") }}</p>
             <h3>{{ t("task.workspaceSubtitle") }}</h3>
           </div>
-          <span class="tag">{{ t("common.items", { count: task.mainConversation.messages.length }) }}</span>
         </div>
 
         <div class="timeline">
@@ -83,74 +48,59 @@
         </div>
       </article>
 
-      <div class="task-side">
-        <QueuePanel :queue="task.queue.filter((item: QueuedMessage) => item.status === 'queued')" @promote="promoteQueue" @cancel="cancelQueue" />
+      <aside class="task-shell__side">
+        <section class="mission-stack mission-stack--result">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">{{ t("result.card") }}</p>
+              <h3>{{ task.resultCard?.title || t("task.goalEmpty") }}</h3>
+            </div>
+            <span class="tag">{{ statusLabel(task.status) }}</span>
+          </div>
+          <p class="muted">
+            {{
+              task.resultCard?.summary ||
+              task.runtimeState?.pendingFinish?.summary ||
+              t("task.contractEmpty")
+            }}
+          </p>
+        </section>
 
-        <section class="mission-stack">
+        <section v-if="task.runtimeState?.pendingFinish" class="mission-stack">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">{{ t("task.contractTitle") }}</p>
+              <h3>{{ task.runtimeState.pendingFinish.resultTitle }}</h3>
+            </div>
+          </div>
+          <p class="muted">{{ task.runtimeState.pendingFinish.summary }}</p>
+        </section>
+
+        <section v-if="task.queue.length" class="mission-stack">
+          <QueuePanel
+            :queue="task.queue.filter((item: QueuedMessage) => item.status === 'queued')"
+            @promote="promoteQueue"
+            @cancel="cancelQueue"
+          />
+        </section>
+
+        <section v-if="task.branches.length" class="mission-stack">
           <div class="section-heading">
             <div>
               <p class="eyebrow">{{ t("task.sideThreads") }}</p>
               <h3>{{ t("task.sideThreadsSubtitle") }}</h3>
             </div>
-            <span class="tag">{{ t("common.items", { count: task.branches.length }) }}</span>
           </div>
-          <div v-if="task.branches.length" class="branch-list">
+          <div class="branch-list">
             <article v-for="branchItem in task.branches" :key="branchItem.id" class="branch-item">
               <strong>{{ branchItem.title }}</strong>
               <p>{{ branchItem.messages[branchItem.messages.length - 1]?.content }}</p>
             </article>
           </div>
-          <p v-else class="muted">{{ t("task.noBranch") }}</p>
         </section>
 
-        <section class="mission-stack mission-stack--contract">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">{{ t("task.contractTitle") }}</p>
-              <h3>{{ t("task.contractSubtitle") }}</h3>
-            </div>
-            <span class="tag">{{ task.runtimeState?.lastStatus || t("task.contractPending") }}</span>
-          </div>
-          <div v-if="task.runtimeState?.pendingFinish" class="contract-sheet">
-            <strong>{{ task.runtimeState.pendingFinish.resultTitle }}</strong>
-            <p>{{ task.runtimeState.pendingFinish.summary }}</p>
-            <span class="tag">{{ task.runtimeState.pendingFinish.needsReview ? t("task.needsReview") : t("task.directFinish") }}</span>
-          </div>
-          <p v-else class="muted">{{ t("task.contractEmpty") }}</p>
-        </section>
-
-        <ResultCardPanel :task="task" @extract="extract" />
-
-        <section class="mission-stack">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">{{ t("task.assets") }}</p>
-              <h3>{{ t("task.assetsSubtitle") }}</h3>
-            </div>
-          </div>
-          <ul class="list">
-            <li v-for="asset in task.assets" :key="asset.id">
-              <strong>{{ asset.title }}</strong>
-              <span>{{ asset.kind }} · {{ asset.summary }}</span>
-            </li>
-          </ul>
-        </section>
-
-        <section class="mission-stack">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow">{{ t("task.shares") }}</p>
-              <h3>{{ t("task.sharesSubtitle") }}</h3>
-            </div>
-          </div>
-          <ul class="list">
-            <li v-for="shareItem in task.shares" :key="shareItem.id">
-              <strong>{{ shareItem.url }}</strong>
-              <span>{{ formatDate(shareItem.createdAt) }}</span>
-            </li>
-          </ul>
-        </section>
-      </div>
+        <ResultCardPanel v-if="task.resultCard" :task="task" @extract="extract" />
+      </aside>
     </section>
   </section>
 </template>
@@ -178,11 +128,6 @@ onMounted(async () => {
 });
 
 const task = computed(() => store.currentTask);
-const currentRuntimeName = computed(() => {
-  const runtimeId = task.value?.runtimeState?.runtimeId;
-  const runtime = store.runtimes.find((item) => item.id === runtimeId);
-  return runtime ? runtimeField(runtime.id, "name", runtime.name) : "—";
-});
 
 function formatDate(value: string): string {
   return new Date(value).toLocaleString(locale.value, {
