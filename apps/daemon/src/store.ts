@@ -3,6 +3,7 @@ import fs from "node:fs";
 import { spawnSync } from "node:child_process";
 import {
   type AppBootstrap,
+  type AppSettings,
   type AssetRecord,
   type Conversation,
   type EventEnvelope,
@@ -39,6 +40,7 @@ import {
 import { previewImport } from "@agentaction/plugin-core";
 import { scanPluginDirectory } from "@agentaction/plugin-core";
 import { LocalDatabase } from "./db";
+import { runCodexTaskReply } from "./runtimeAgent";
 import { buildCollectingReply, buildReviewSummary, buildRunningReply } from "./simulate";
 
 function commandLocatorForCurrentOs(): { command: string; args: (binary: string) => string[] } {
@@ -126,6 +128,16 @@ export class AppStore {
     getDefaultProviders().forEach((provider) =>
       this.db.upsert("providers", provider, nowIso())
     );
+
+    const settings = this.db.get<AppSettings>("settings" as never, "settings");
+    const nextSettings: AppSettings = settings ?? {
+      defaultRuntimeId: "runtime_hack_codex_cli",
+      defaultRuntimeLabel: "Codex",
+      defaultRuntimeEnabled: true,
+      defaultRuntimeSandbox: "read-only",
+      defaultRuntimeMode: "advisory"
+    };
+    this.db.upsert("settings" as never, { id: "settings", ...nextSettings } as never, nowIso());
   }
 
   bootstrap(): AppBootstrap {
@@ -138,10 +150,21 @@ export class AppStore {
       equipment: this.db.list("equipment"),
       runtimes: this.db.list("runtimes"),
       providers: this.db.list("providers"),
+      settings: this.getSettings(),
       tasks,
       assets,
       pluginInventory: this.scanPluginInventory()
     };
+  }
+
+  getSettings(): AppSettings {
+    const settings = this.db.get<(AppSettings & { id: string })>("settings" as never, "settings");
+    if (!settings) {
+      throw new Error("Settings missing");
+    }
+    const { id, ...rest } = settings;
+    void id;
+    return rest;
   }
 
   listTasks(): Task[] {
@@ -181,10 +204,11 @@ export class AppStore {
     return task;
   }
 
-  sendMainMessage(taskId: string, content: string, authorLabel = "你"): Task {
+  async sendMainMessage(taskId: string, content: string, authorLabel = "你"): Promise<Task> {
     const task = this.getTask(taskId);
     const template = this.db.get<TaskTemplatePlugin>("templates", task.templateId ?? "");
     const roles = this.db.list<Role>("roles");
+    const settings = this.getSettings();
     const trimmed = content.trim();
 
     if (trimmed.startsWith("/btw ")) {
@@ -210,22 +234,61 @@ export class AppStore {
       );
 
       if (task.status === "running") {
-        addAssistantEvent(
-          task,
-          "系统",
-          buildRunningReply(task, roles)
-        );
+        const runtimeReply = await this.tryRunDefaultRuntime(task, template ?? undefined, roles, settings);
+        addAssistantEvent(task, "Codex", runtimeReply ?? buildRunningReply(task, roles));
       }
     } else {
+      const runtimeReply = await this.tryRunDefaultRuntime(task, template ?? undefined, roles, settings);
       addAssistantEvent(
         task,
-        roles.find((role) => role.id === task.roleSelections[0]?.roleId)?.displayName ?? "角色",
-        "已收到这条补充，我会继续沿当前任务上下文处理。"
+        runtimeReply ? "Codex" : roles.find((role) => role.id === task.roleSelections[0]?.roleId)?.displayName ?? "角色",
+        runtimeReply ?? "已收到这条补充，我会继续沿当前任务上下文处理。"
       );
     }
 
     this.saveTask(task, "conversation.delta", { taskId, content, authorLabel });
     return task;
+  }
+
+  private async tryRunDefaultRuntime(
+    task: Task,
+    template: TaskTemplatePlugin | undefined,
+    roles: Role[],
+    settings: AppSettings
+  ): Promise<string | undefined> {
+    if (process.env.AGENTACTION_DISABLE_DEFAULT_RUNTIME === "1") {
+      return undefined;
+    }
+
+    if (!settings.defaultRuntimeEnabled || settings.defaultRuntimeId !== "runtime_hack_codex_cli") {
+      return undefined;
+    }
+
+    let runtime = this.db.get<RuntimePlugin>("runtimes", settings.defaultRuntimeId);
+    if (!runtime) {
+      return undefined;
+    }
+
+    if (runtime.checkState !== "passed" || runtime.status !== "ready") {
+      runtime = this.checkRuntime(settings.defaultRuntimeId);
+    }
+
+    if (runtime.checkState !== "passed" || runtime.status !== "ready") {
+      return undefined;
+    }
+
+    try {
+      return await runCodexTaskReply({
+        task,
+        template,
+        roles,
+        runtime,
+        workspaceRoot: this.workspaceRoot,
+        sandbox: settings.defaultRuntimeSandbox
+      });
+    } catch (error) {
+      return `Codex 默认智能体调用失败：${(error as Error).message}`;
+    }
   }
 
   queueMessage(taskId: string, content: string, from: string): { task: Task; entry: QueuedMessage } {

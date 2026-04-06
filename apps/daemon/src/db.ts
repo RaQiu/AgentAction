@@ -7,6 +7,7 @@ type RecordKind =
   | "equipment"
   | "runtimes"
   | "providers"
+  | "settings"
   | "tasks";
 
 interface DatabaseLike {

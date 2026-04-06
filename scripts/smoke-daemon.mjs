@@ -51,7 +51,8 @@ async function main() {
     env: {
       ...process.env,
       AGENTACTION_ROOT: root,
-      AGENTACTION_DAEMON_PORT: String(port)
+      AGENTACTION_DAEMON_PORT: String(port),
+      AGENTACTION_DISABLE_DEFAULT_RUNTIME: "1"
     },
     stdio: ["ignore", "pipe", "pipe"]
   });

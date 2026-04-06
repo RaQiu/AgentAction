@@ -12,6 +12,7 @@
     "smoke:daemon": "node scripts/smoke-daemon.mjs",
     "smoke:desktop": "node scripts/smoke-desktop.mjs",
     "smoke:runtimes": "node scripts/smoke-runtimes.mjs",
+    "smoke:codex-default": "node scripts/smoke-codex-default.mjs",
     "smoke": "pnpm smoke:daemon && pnpm smoke:desktop"
   },
   "pnpm": {

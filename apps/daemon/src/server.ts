@@ -72,9 +72,9 @@ app.post("/api/templates/:templateId/tasks", (req, res) => {
   }
 });
 
-app.post("/api/tasks/:taskId/messages", (req, res) => {
+app.post("/api/tasks/:taskId/messages", async (req, res) => {
   try {
-    const task = store.sendMainMessage(
+    const task = await store.sendMainMessage(
       req.params.taskId,
       String(req.body?.content ?? ""),
       req.body?.authorLabel ?? "你"

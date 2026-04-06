@@ -222,6 +222,7 @@ export interface AppBootstrap {
   equipment: EquipmentPlugin[];
   runtimes: RuntimePlugin[];
   providers: ProviderConfig[];
+  settings: AppSettings;
   tasks: Task[];
   assets: AssetRecord[];
   pluginInventory: PluginInventory;
@@ -235,6 +236,14 @@ export interface ProviderConfig {
   role: string;
   proxyMode: "split-by-target" | "direct-only" | "system";
   note: string;
+}
+
+export interface AppSettings {
+  defaultRuntimeId: string;
+  defaultRuntimeLabel: string;
+  defaultRuntimeEnabled: boolean;
+  defaultRuntimeSandbox: "read-only" | "workspace-write";
+  defaultRuntimeMode: "advisory" | "active";
 }
 
 export interface PluginDirectoryEntry {
