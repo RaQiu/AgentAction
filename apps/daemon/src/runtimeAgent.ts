@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import type { Role, RuntimePlugin, Task, TaskTemplatePlugin } from "@agentaction/shared";
+import type { RuntimeTemplateEvent, RuntimeTemplateTaskResult } from "@agentaction/runtime-core";
 
 interface CodexExecutionConfig {
   task: Task;
@@ -10,19 +11,6 @@ interface CodexExecutionConfig {
   runtime: RuntimePlugin;
   workspaceRoot: string;
   sandbox: "read-only" | "workspace-write";
-}
-
-export interface CodexRuntimeEvent {
-  kind: "thread" | "turn" | "tool-start" | "tool-end" | "agent-message" | "finish";
-  summary: string;
-  rawType?: string;
-  command?: string;
-  output?: string;
-}
-
-export interface CodexExecutionResult {
-  reply: string;
-  events: CodexRuntimeEvent[];
 }
 
 function existingPathCandidate(values: string[]): string | undefined {
@@ -78,7 +66,7 @@ function safeJsonParse(line: string): Record<string, unknown> | null {
   }
 }
 
-export async function runCodexTaskReply(config: CodexExecutionConfig): Promise<CodexExecutionResult> {
+export async function runCodexTaskReply(config: CodexExecutionConfig): Promise<RuntimeTemplateTaskResult> {
   const workdirCandidate = existingPathCandidate(config.task.collectedMaterials) ?? config.workspaceRoot;
   const prompt = buildPrompt(config.task, config.template, config.roles);
 
@@ -93,7 +81,7 @@ export async function runCodexTaskReply(config: CodexExecutionConfig): Promise<C
     prompt
   ];
 
-  const events: CodexRuntimeEvent[] = [];
+  const events: RuntimeTemplateEvent[] = [];
   let stderr = "";
   let stdoutBuffer = "";
   let reply = "";
@@ -190,6 +178,7 @@ export async function runCodexTaskReply(config: CodexExecutionConfig): Promise<C
 
   return {
     reply,
+    authorLabel: "Codex",
     events
   };
 }

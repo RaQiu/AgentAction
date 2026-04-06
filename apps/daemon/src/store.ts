@@ -1,6 +1,4 @@
 import path from "node:path";
-import fs from "node:fs";
-import { spawnSync } from "node:child_process";
 import {
   type AppBootstrap,
   type AppSettings,
@@ -40,45 +38,8 @@ import {
 import { previewImport } from "@agentaction/plugin-core";
 import { scanPluginDirectory } from "@agentaction/plugin-core";
 import { LocalDatabase } from "./db";
-import { runCodexTaskReply } from "./runtimeAgent";
+import { getRuntimeTemplate } from "./runtimeTemplates";
 import { buildCollectingReply, buildReviewSummary, buildRunningReply } from "./simulate";
-
-function commandLocatorForCurrentOs(): { command: string; args: (binary: string) => string[] } {
-  if (process.platform === "win32") {
-    return {
-      command: "where",
-      args: (binary) => [binary]
-    };
-  }
-
-  return {
-    command: "which",
-    args: (binary) => [binary]
-  };
-}
-
-function firstNonEmptyLine(value: string): string | undefined {
-  return value
-    .split("\n")
-    .map((line) => line.trim())
-    .find(Boolean);
-}
-
-function repoLooksRunnable(targetDir: string): string[] {
-  const candidatePaths = [
-    "package.json",
-    "pyproject.toml",
-    "Cargo.toml",
-    "go.mod",
-    "requirements.txt",
-    "README.md",
-    "src/main.py",
-    "src/setup.py",
-    "rust/Cargo.toml"
-  ];
-
-  return candidatePaths.filter((signal) => fs.existsSync(path.join(targetDir, signal)));
-}
 
 export class AppStore {
   private readonly db: LocalDatabase;
@@ -283,13 +244,19 @@ export class AppStore {
       return undefined;
     }
 
+    const runtimeTemplate = getRuntimeTemplate(runtime);
+    if (!runtimeTemplate?.runTask) {
+      return undefined;
+    }
+
     try {
-      const result = await runCodexTaskReply({
+      const result = await runtimeTemplate.runTask({
         task,
         template,
         roles,
         runtime,
         workspaceRoot: this.workspaceRoot,
+        stateRoot: this.stateRoot,
         sandbox: settings.defaultRuntimeSandbox
       });
 
@@ -309,7 +276,7 @@ export class AppStore {
 
       return {
         reply: result.reply,
-        authorLabel: "Codex"
+        authorLabel: result.authorLabel
       };
     } catch (error) {
       return {
@@ -423,45 +390,15 @@ export class AppStore {
       throw new Error("Runtime not found");
     }
 
-    if ((runtime.installMode !== "clone" && !runtime.supportsCloneInstall) || !runtime.githubUrl) {
+    const runtimeTemplate = getRuntimeTemplate(runtime);
+    if (!runtimeTemplate?.installFromGitHub) {
       throw new Error("This runtime does not support GitHub clone install");
     }
 
-    const runtimeDir = path.join(
-      this.stateRoot,
-      "runtime-clones",
-      runtime.targetRuntime
-    );
-
-    fs.rmSync(runtimeDir, { recursive: true, force: true });
-    fs.mkdirSync(path.dirname(runtimeDir), { recursive: true });
-
-    const args = ["clone"];
-    if (runtime.shallowClone) {
-      args.push("--depth", "1", "--filter=blob:none");
-    }
-    args.push(runtime.githubUrl, runtimeDir);
-
-    const result = spawnSync("git", args, {
-      cwd: this.workspaceRoot,
-      encoding: "utf-8"
+    const updated = runtimeTemplate.installFromGitHub(runtime, {
+      workspaceRoot: this.workspaceRoot,
+      stateRoot: this.stateRoot
     });
-
-    if (result.status !== 0) {
-      throw new Error(result.stderr || result.stdout || "Git clone failed");
-    }
-
-    const updated: RuntimePlugin = {
-      ...runtime,
-      source: "cloned-source",
-      status: "ready",
-      pathHint: runtimeDir,
-      checkState: "partial",
-      checkSummary: "GitHub clone 已完成，等待进一步 hack/运行探测。",
-      checkDetails: [`已克隆到 ${runtimeDir}`],
-      lastCheckedAt: nowIso()
-    };
-
     this.db.upsert("runtimes", updated, nowIso());
     return updated;
   }
@@ -473,94 +410,15 @@ export class AppStore {
       throw new Error("Runtime not found");
     }
 
-    const details: string[] = [];
-    let existingPassed = false;
-    let clonePassed = false;
-    let detectedCommandPath = runtime.detectedCommandPath;
-    let detectedVersion = runtime.detectedVersion;
-
-    if (runtime.githubUrl) {
-      const remote = spawnSync("git", ["ls-remote", runtime.githubUrl, "HEAD"], {
-        cwd: this.workspaceRoot,
-        encoding: "utf-8"
-      });
-
-      if (remote.status === 0) {
-        details.push(`GitHub 可达：${firstNonEmptyLine(remote.stdout) ?? runtime.githubUrl}`);
-      } else {
-        details.push(`GitHub 不可达：${runtime.githubUrl}`);
-      }
+    const runtimeTemplate = getRuntimeTemplate(runtime);
+    if (!runtimeTemplate) {
+      throw new Error(`No runtime template for ${runtime.targetRuntime}`);
     }
 
-    if (runtime.command) {
-      const locator = commandLocatorForCurrentOs();
-      const locate = spawnSync(locator.command, locator.args(runtime.command), {
-        cwd: this.workspaceRoot,
-        encoding: "utf-8"
-      });
-
-      if (locate.status === 0) {
-        detectedCommandPath = firstNonEmptyLine(locate.stdout);
-        details.push(`命令存在：${detectedCommandPath}`);
-
-        const probe = spawnSync(runtime.command, runtime.probeArgs ?? ["--version"], {
-          cwd: this.workspaceRoot,
-          encoding: "utf-8"
-        });
-
-        const stdout = `${probe.stdout ?? ""}\n${probe.stderr ?? ""}`.trim();
-        if (probe.status === 0 || stdout.length > 0) {
-          existingPassed = true;
-          detectedVersion = firstNonEmptyLine(stdout) ?? detectedVersion;
-          details.push(`hack 探测通过：${detectedVersion ?? "已拿到命令输出"}`);
-        } else {
-          details.push(`hack 探测失败：命令可执行但没有拿到有效输出`);
-        }
-      } else {
-        details.push(`命令缺失：${runtime.command}`);
-      }
-    }
-
-    if (runtime.pathHint && fs.existsSync(runtime.pathHint)) {
-      const signals = repoLooksRunnable(runtime.pathHint);
-      if (signals.length > 0) {
-        clonePassed = true;
-        details.push(`clone 仓库有效：检测到 ${signals.join("、")}`);
-      } else {
-        details.push(`clone 仓库存在，但缺少常见项目入口文件`);
-      }
-    } else if (runtime.source === "cloned-source") {
-      details.push(`clone 路径缺失：${runtime.pathHint ?? "未记录路径"}`);
-    }
-
-    let checkState: RuntimePlugin["checkState"] = "failed";
-    let status: RuntimePlugin["status"] = "missing";
-    let checkSummary = "既没有通过 hack 检查，也没有通过 clone 检查。";
-
-    if (existingPassed && clonePassed) {
-      checkState = "passed";
-      status = "ready";
-      checkSummary = "hack 与 clone 检查都通过。";
-    } else if (existingPassed) {
-      checkState = "passed";
-      status = "ready";
-      checkSummary = "hack 注入探测通过。";
-    } else if (clonePassed) {
-      checkState = "partial";
-      status = "degraded";
-      checkSummary = "clone 检查通过，但 hack 注入尚未通过。";
-    }
-
-    const updated: RuntimePlugin = {
-      ...runtime,
-      detectedCommandPath,
-      detectedVersion,
-      checkState,
-      checkSummary,
-      checkDetails: details,
-      status,
-      lastCheckedAt: nowIso()
-    };
+    const updated = runtimeTemplate.check(runtime, {
+      workspaceRoot: this.workspaceRoot,
+      stateRoot: this.stateRoot
+    });
 
     this.db.upsert("runtimes", updated, nowIso());
     return updated;
