@@ -3,8 +3,13 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { app, BrowserWindow } from "electron";
 
 let daemonProcess: ChildProcess | undefined;
+const isHeadlessSmoke = process.env.AGENTACTION_HEADLESS_SMOKE === "1";
 
 function createWindow(): void {
+  if (isHeadlessSmoke) {
+    return;
+  }
+
   const window = new BrowserWindow({
     width: 1500,
     height: 980,
@@ -33,10 +38,16 @@ function spawnPackagedDaemon(): void {
   }
 
   const daemonEntry = path.join(process.resourcesPath, "daemon", "server.js");
+  const stateDir = path.join(app.getPath("userData"), "daemon-state");
   daemonProcess = spawn(process.execPath, [daemonEntry], {
     cwd: process.resourcesPath,
     stdio: "ignore",
-    detached: false
+    detached: false,
+    env: {
+      ...process.env,
+      ELECTRON_RUN_AS_NODE: "1",
+      AGENTACTION_STATE_DIR: stateDir
+    }
   });
 }
 
@@ -45,6 +56,10 @@ app.whenReady().then(() => {
   createWindow();
 
   app.on("activate", () => {
+    if (isHeadlessSmoke) {
+      return;
+    }
+
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
     }
@@ -52,6 +67,11 @@ app.whenReady().then(() => {
 });
 
 app.on("window-all-closed", () => {
+  if (isHeadlessSmoke) {
+    app.quit();
+    return;
+  }
+
   if (process.platform !== "darwin") {
     app.quit();
   }

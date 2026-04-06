@@ -43,10 +43,14 @@ import { buildCollectingReply, buildReviewSummary, buildRunningReply } from "./s
 
 export class AppStore {
   private readonly db: LocalDatabase;
+  private readonly stateRoot: string;
 
   constructor(private readonly workspaceRoot: string) {
+    this.stateRoot =
+      process.env.AGENTACTION_STATE_DIR ??
+      path.join(workspaceRoot, "apps/daemon/.agentaction-data");
     this.db = new LocalDatabase(
-      path.join(workspaceRoot, "apps/daemon/.agentaction-data/agentaction.db")
+      path.join(this.stateRoot, "agentaction.db")
     );
     this.seed();
   }
@@ -280,8 +284,8 @@ export class AppStore {
     }
 
     const runtimeDir = path.join(
-      this.workspaceRoot,
-      "plugins/runtimes/clones",
+      this.stateRoot,
+      "runtime-clones",
       runtime.targetRuntime
     );
 
@@ -306,7 +310,7 @@ export class AppStore {
     const updated: RuntimePlugin = {
       ...runtime,
       status: "ready",
-      pathHint: path.relative(this.workspaceRoot, runtimeDir)
+      pathHint: runtimeDir
     };
 
     this.db.upsert("runtimes", updated, nowIso());

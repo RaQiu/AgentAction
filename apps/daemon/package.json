@@ -23,7 +23,7 @@
   },
   "scripts": {
     "dev": "tsx src/server.ts",
-    "build": "tsup src/server.ts --format cjs --clean",
+    "build": "tsup --config tsup.config.ts",
     "typecheck": "tsc --noEmit"
   }
 }

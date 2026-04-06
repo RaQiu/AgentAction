@@ -8,7 +8,10 @@
     "dev": "pnpm build:packages && concurrently -k \"pnpm --filter @agentaction/daemon dev\" \"pnpm --filter @agentaction/desktop dev\"",
     "build": "pnpm build:packages && pnpm --filter @agentaction/daemon build && pnpm --filter @agentaction/desktop build && pnpm --filter @agentaction/relay build",
     "typecheck": "pnpm build:packages && pnpm --filter @agentaction/daemon typecheck && pnpm --filter @agentaction/desktop typecheck && pnpm --filter @agentaction/relay typecheck",
-    "package:desktop": "pnpm build && pnpm --filter @agentaction/desktop dist"
+    "package:desktop": "pnpm build && pnpm --filter @agentaction/desktop dist",
+    "smoke:daemon": "node scripts/smoke-daemon.mjs",
+    "smoke:desktop": "node scripts/smoke-desktop.mjs",
+    "smoke": "pnpm smoke:daemon && pnpm smoke:desktop"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

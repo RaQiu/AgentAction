@@ -40,6 +40,10 @@
       {
         "from": "../daemon/dist",
         "to": "daemon"
+      },
+      {
+        "from": "../../plugins",
+        "to": "plugins"
       }
     ],
     "mac": {
