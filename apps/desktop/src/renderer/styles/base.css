@@ -359,13 +359,19 @@ strong {
 .dispatch-slot {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
+}
+
+.dispatch-slot__name {
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1.2;
 }
 
 .dispatch-slot__portrait {
   width: 100%;
-  max-width: 180px;
+  max-width: 168px;
   aspect-ratio: 1 / 1;
   border-radius: 22px;
   background:
@@ -380,25 +386,7 @@ strong {
 }
 
 .dispatch-slot__portrait span {
-  font-size: 3rem;
-}
-
-.dispatch-slot__label {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  align-items: center;
-  text-align: center;
-}
-
-.dispatch-slot__label strong {
-  font-size: 0.92rem;
-}
-
-.dispatch-slot__label span {
-  color: var(--muted);
-  font-size: 0.76rem;
-  line-height: 1.25;
+  font-size: 3.2rem;
 }
 
 .dispatch-arena__link {

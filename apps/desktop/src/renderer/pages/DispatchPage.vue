@@ -24,12 +24,9 @@
         <div class="dispatch-arena">
           <template v-for="(role, index) in recommendedRoles" :key="role.id">
             <article class="dispatch-slot">
+              <span class="dispatch-slot__name">{{ roleDisplayName(role.id, role.displayName) }}</span>
               <div class="dispatch-slot__portrait">
                 <span>{{ roleNickname(role.id, role.nickname) }}</span>
-              </div>
-              <div class="dispatch-slot__label">
-                <strong>{{ roleDisplayName(role.id, role.displayName) }}</strong>
-                <span>{{ dispatchRoleHint(role.id) }}</span>
               </div>
             </article>
             <div
@@ -118,13 +115,6 @@ const recommendedEquipment = computed(() =>
     template.value?.recommendedEquipmentIds.includes(equipment.id)
   )
 );
-
-function dispatchRoleHint(roleId: string) {
-  if (roleId === "role_product_xiaoce") {
-    return t("dispatch.roleProductHint");
-  }
-  return t("dispatch.roleEngineerHint");
-}
 
 async function startTask() {
   if (!template.value) {
