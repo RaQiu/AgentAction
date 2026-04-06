@@ -11,58 +11,58 @@
       </div>
 
       <div class="launch-hero__stage">
-        <div class="launch-stage__meta">
-          <span class="launch-stage__pill">{{ defaultRuntimeName }}</span>
-          <span class="launch-stage__pill">{{ latestTask ? statusLabel(latestTask.status) : t("home.noTask") }}</span>
-        </div>
+        <template v-if="latestTask">
+          <div class="launch-stage__meta">
+            <span class="launch-stage__pill">{{ taskRuntimeName }}</span>
+            <span class="launch-stage__pill">{{ statusLabel(latestTask.status) }}</span>
+          </div>
 
-        <div class="launch-stage__roles">
-          <div class="launch-stage__role">
-            <span class="launch-stage__avatar">🐮</span>
-            <div>
-              <strong>{{ t("home.roleProduct") }}</strong>
-              <span>{{ t("task.requestReview") }}</span>
+          <div v-if="taskRoles.length" class="launch-stage__roles">
+            <div v-for="role in taskRoles" :key="role.id" class="launch-stage__role">
+              <span class="launch-stage__avatar">{{ roleNickname(role.id, role.nickname) }}</span>
+              <div>
+                <strong>{{ roleDisplayName(role.id, role.displayName) }}</strong>
+                <span>{{ roleStatusLabel(role.id) }}</span>
+              </div>
             </div>
           </div>
-          <div class="launch-stage__role">
-            <span class="launch-stage__avatar">🐎</span>
-            <div>
-              <strong>{{ t("home.roleEngineer") }}</strong>
-              <span>{{ t("home.running") }}</span>
-            </div>
-          </div>
-        </div>
 
-        <ol class="launch-stage__timeline">
-          <li class="launch-stage__step launch-stage__step--done">
-            <span class="launch-stage__dot"></span>
-            <div>
-              <strong>{{ t("home.stepAssigned") }}</strong>
-              <p>{{ latestTaskTitle }}</p>
-            </div>
-          </li>
-          <li class="launch-stage__step launch-stage__step--done">
-            <span class="launch-stage__dot"></span>
-            <div>
-              <strong>{{ t("home.stepMaterials") }}</strong>
-              <p>{{ t("home.materialCount", { count: latestTask?.collectedMaterials?.length || 0 }) }}</p>
-            </div>
-          </li>
-          <li class="launch-stage__step launch-stage__step--active">
-            <span class="launch-stage__dot"></span>
-            <div>
-              <strong>{{ t("home.stepBattle") }}</strong>
-              <p>{{ latestTask?.runtimeState?.pendingFinish?.summary || t("home.progressing") }}</p>
-            </div>
-          </li>
-          <li class="launch-stage__step">
-            <span class="launch-stage__dot"></span>
-            <div>
-              <strong>{{ t("home.stepDeliver") }}</strong>
-              <p>{{ latestTask?.resultCard?.title || t("home.waitingResult") }}</p>
-            </div>
-          </li>
-        </ol>
+          <ol class="launch-stage__timeline">
+            <li class="launch-stage__step" :class="stepTone('assigned')">
+              <span class="launch-stage__dot"></span>
+              <div>
+                <strong>{{ t("home.stepAssigned") }}</strong>
+                <p>{{ latestTaskTitle }}</p>
+              </div>
+            </li>
+            <li class="launch-stage__step" :class="stepTone('materials')">
+              <span class="launch-stage__dot"></span>
+              <div>
+                <strong>{{ t("home.stepMaterials") }}</strong>
+                <p>{{ t("home.materialCount", { count: latestTask.collectedMaterials.length }) }}</p>
+              </div>
+            </li>
+            <li class="launch-stage__step" :class="stepTone('battle')">
+              <span class="launch-stage__dot"></span>
+              <div>
+                <strong>{{ t("home.stepBattle") }}</strong>
+                <p>{{ latestTaskSummary }}</p>
+              </div>
+            </li>
+            <li class="launch-stage__step" :class="stepTone('deliver')">
+              <span class="launch-stage__dot"></span>
+              <div>
+                <strong>{{ t("home.stepDeliver") }}</strong>
+                <p>{{ latestTask.resultCard?.title || t("home.waitingResult") }}</p>
+              </div>
+            </li>
+          </ol>
+        </template>
+
+        <div v-else class="launch-stage__empty">
+          <strong>{{ t("home.noTask") }}</strong>
+          <p>{{ t("home.noTaskDesc") }}</p>
+        </div>
       </div>
     </article>
   </section>
@@ -76,7 +76,7 @@ import { useI18n } from "@/i18n";
 import { useWorkbenchStore } from "@/stores/workbench";
 
 const store = useWorkbenchStore();
-const { t, templateField, runtimeField } = useI18n();
+const { t, templateField, runtimeField, roleDisplayName, roleNickname } = useI18n();
 
 function statusLabel(status: TaskStatus) {
   return t(`status.${status}`);
@@ -102,4 +102,60 @@ const defaultRuntimeName = computed(() => {
   const runtime = runtimes.value.find((item) => item.id === store.settings?.defaultRuntimeId);
   return runtime ? runtimeField(runtime.id, "name", runtime.name) : "—";
 });
+const taskRuntimeName = computed(() => {
+  const runtimeId = latestTask.value?.runtimeState?.runtimeId;
+  const runtime = runtimes.value.find((item) => item.id === runtimeId);
+  return runtime ? runtimeField(runtime.id, "name", runtime.name) : defaultRuntimeName.value;
+});
+const taskRoles = computed(() =>
+  (latestTask.value?.roleSelections ?? [])
+    .map((selection) => store.roles.find((role) => role.id === selection.roleId))
+    .filter((role): role is NonNullable<typeof role> => Boolean(role))
+);
+const latestTaskSummary = computed(() => {
+  const task = latestTask.value;
+  if (!task) {
+    return t("home.noTaskDesc");
+  }
+  const latestAssistant = [...task.mainConversation.messages]
+    .reverse()
+    .find((message) => message.role !== "user");
+  return latestAssistant?.content || t("home.progressing");
+});
+
+function roleStatusLabel(roleId: string) {
+  if (roleId === "role_product_xiaoce") {
+    return latestTask.value?.status === "review" ? t("task.requestReview") : t("home.stepBattle");
+  }
+  return latestTask.value?.status === "collecting" ? t("home.stepMaterials") : t("home.running");
+}
+
+function stepTone(step: "assigned" | "materials" | "battle" | "deliver") {
+  const status = latestTask.value?.status;
+  if (!status) {
+    return "";
+  }
+
+  if (step === "assigned") {
+    return "launch-stage__step--done";
+  }
+  if (step === "materials") {
+    return status === "collecting" ? "launch-stage__step--active" : "launch-stage__step--done";
+  }
+  if (step === "battle") {
+    return status === "running" || status === "review" || status === "done"
+      ? status === "running"
+        ? "launch-stage__step--active"
+        : "launch-stage__step--done"
+      : "";
+  }
+  if (step === "deliver") {
+    return status === "done"
+      ? "launch-stage__step--done"
+      : status === "review"
+        ? "launch-stage__step--active"
+        : "";
+  }
+  return "";
+}
 </script>
