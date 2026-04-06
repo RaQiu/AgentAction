@@ -5,6 +5,12 @@
         <p class="eyebrow">{{ t("nav.dashboard") }}</p>
         <h1>{{ t("home.title") }}</h1>
         <p class="page__lead">{{ t("home.subtitle") }}</p>
+        <ul class="launch-case-list">
+          <li v-for="template in heroTemplates" :key="template.id" class="launch-case-list__item">
+            <span class="launch-case-list__index">{{ caseNumber(template.id) }}</span>
+            <span class="launch-case-list__text">{{ templateField(template.id, "title", template.title) }}</span>
+          </li>
+        </ul>
         <div class="launch-hero__actions">
           <RouterLink :to="firstTemplateRoute" class="button button--primary">{{ t("home.primaryCta") }}</RouterLink>
         </div>
@@ -89,6 +95,7 @@ onMounted(() => {
 const templates = computed(() => store.templates);
 const runtimes = computed(() => store.runtimes);
 const tasks = computed(() => store.tasks);
+const heroTemplates = computed(() => templates.value.slice(0, 4));
 const latestTask = computed(() => tasks.value[0]);
 const latestTaskTitle = computed(() => {
   const task = latestTask.value;
@@ -102,6 +109,10 @@ const defaultRuntimeName = computed(() => {
   const runtime = runtimes.value.find((item) => item.id === store.settings?.defaultRuntimeId);
   return runtime ? runtimeField(runtime.id, "name", runtime.name) : "—";
 });
+
+function caseNumber(templateId: string) {
+  return heroTemplates.value.findIndex((item) => item.id === templateId) + 1;
+}
 const taskRuntimeName = computed(() => {
   const runtimeId = latestTask.value?.runtimeState?.runtimeId;
   const runtime = runtimes.value.find((item) => item.id === runtimeId);

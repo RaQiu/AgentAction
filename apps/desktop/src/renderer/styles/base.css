@@ -620,6 +620,44 @@ strong {
   max-width: 38rem;
 }
 
+.launch-case-list {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 40rem;
+}
+
+.launch-case-list__item {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 8px 0;
+  border-top: 1px solid rgba(24, 40, 64, 0.08);
+}
+
+.launch-case-list__index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(75, 137, 220, 0.08);
+  color: var(--accent-strong);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.launch-case-list__text {
+  color: var(--text);
+  font-size: 0.9rem;
+  line-height: 1.42;
+}
+
 .launch-hero__actions {
   margin-top: 8px;
 }
