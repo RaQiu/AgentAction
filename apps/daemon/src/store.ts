@@ -1,4 +1,6 @@
 import path from "node:path";
+import fs from "node:fs";
+import { spawnSync } from "node:child_process";
 import {
   type AppBootstrap,
   type AssetRecord,
@@ -50,33 +52,23 @@ export class AppStore {
   }
 
   private seed(): void {
-    if (this.db.list<TaskTemplatePlugin>("templates").length === 0) {
-      getOfficialTemplates().forEach((template) =>
-        this.db.upsert("templates", template, nowIso())
-      );
-    }
+    getOfficialTemplates().forEach((template) =>
+      this.db.upsert("templates", template, nowIso())
+    );
 
-    if (this.db.list<Role>("roles").length === 0) {
-      getOfficialRoles().forEach((role) => this.db.upsert("roles", role, nowIso()));
-    }
+    getOfficialRoles().forEach((role) => this.db.upsert("roles", role, nowIso()));
 
-    if (this.db.list("equipment").length === 0) {
-      getOfficialEquipment().forEach((equipment) =>
-        this.db.upsert("equipment", equipment, nowIso())
-      );
-    }
+    getOfficialEquipment().forEach((equipment) =>
+      this.db.upsert("equipment", equipment, nowIso())
+    );
 
-    if (this.db.list<RuntimePlugin>("runtimes").length === 0) {
-      getOfficialRuntimePlugins().forEach((runtime) =>
-        this.db.upsert("runtimes", runtime, nowIso())
-      );
-    }
+    getOfficialRuntimePlugins().forEach((runtime) =>
+      this.db.upsert("runtimes", runtime, nowIso())
+    );
 
-    if (this.db.list<ProviderConfig>("providers").length === 0) {
-      getDefaultProviders().forEach((provider) =>
-        this.db.upsert("providers", provider, nowIso())
-      );
-    }
+    getDefaultProviders().forEach((provider) =>
+      this.db.upsert("providers", provider, nowIso())
+    );
   }
 
   bootstrap(): AppBootstrap {
@@ -274,6 +266,51 @@ export class AppStore {
 
   previewImport(content: string) {
     return previewImport(content);
+  }
+
+  installRuntimeFromGitHub(runtimeId: string): RuntimePlugin {
+    const runtime = this.db.get<RuntimePlugin>("runtimes", runtimeId);
+
+    if (!runtime) {
+      throw new Error("Runtime not found");
+    }
+
+    if (runtime.installMode !== "clone" || !runtime.githubUrl) {
+      throw new Error("This runtime does not support GitHub clone install");
+    }
+
+    const runtimeDir = path.join(
+      this.workspaceRoot,
+      "plugins/runtimes/clones",
+      runtime.targetRuntime
+    );
+
+    fs.rmSync(runtimeDir, { recursive: true, force: true });
+    fs.mkdirSync(path.dirname(runtimeDir), { recursive: true });
+
+    const args = ["clone"];
+    if (runtime.shallowClone) {
+      args.push("--depth", "1", "--filter=blob:none");
+    }
+    args.push(runtime.githubUrl, runtimeDir);
+
+    const result = spawnSync("git", args, {
+      cwd: this.workspaceRoot,
+      encoding: "utf-8"
+    });
+
+    if (result.status !== 0) {
+      throw new Error(result.stderr || result.stdout || "Git clone failed");
+    }
+
+    const updated: RuntimePlugin = {
+      ...runtime,
+      status: "ready",
+      pathHint: path.relative(this.workspaceRoot, runtimeDir)
+    };
+
+    this.db.upsert("runtimes", updated, nowIso());
+    return updated;
   }
 
   cloneRole(roleId: string): Role {

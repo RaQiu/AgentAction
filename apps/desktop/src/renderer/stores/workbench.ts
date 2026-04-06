@@ -248,6 +248,23 @@ export const useWorkbenchStore = defineStore("workbench", () => {
     };
   }
 
+  async function installRuntimeFromGitHub(runtimeId: string): Promise<void> {
+    await ensureInitialized();
+    const runtime = await api.installRuntimeFromGitHub(runtimeId);
+
+    if (!bootstrap.value) {
+      return;
+    }
+
+    bootstrap.value = {
+      ...bootstrap.value,
+      runtimes: bootstrap.value.runtimes.map((item) =>
+        item.id === runtime.id ? runtime : item
+      ),
+      pluginInventory: await api.bootstrap().then((payload) => payload.pluginInventory)
+    };
+  }
+
   return {
     bootstrap,
     templates,
@@ -278,6 +295,7 @@ export const useWorkbenchStore = defineStore("workbench", () => {
     shareTask,
     extract,
     cloneRole,
-    syncCloneBack
+    syncCloneBack,
+    installRuntimeFromGitHub
   };
 });

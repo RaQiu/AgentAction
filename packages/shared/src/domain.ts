@@ -80,6 +80,10 @@ export interface RuntimePlugin {
   targetRuntime: string;
   command?: string;
   pathHint?: string;
+  githubUrl?: string;
+  installLabel?: string;
+  installMode?: "existing" | "clone";
+  shallowClone?: boolean;
   capabilities: string[];
   status: "ready" | "degraded" | "missing";
 }

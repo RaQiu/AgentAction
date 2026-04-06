@@ -330,6 +330,9 @@ const officialRuntimePlugins: RuntimePlugin[] = [
     supportMode: "enhanced",
     targetRuntime: "codex",
     command: "codex",
+    githubUrl: "https://github.com/openai/codex",
+    installLabel: "优先复用本机已安装 Codex CLI，也可参考官方仓库安装。",
+    installMode: "existing",
     capabilities: ["stream", "tool-events", "compact-detect", "finish"],
     status: "ready"
   },
@@ -342,6 +345,9 @@ const officialRuntimePlugins: RuntimePlugin[] = [
     supportMode: "enhanced",
     targetRuntime: "claw-code",
     command: "claw-code",
+    githubUrl: "https://github.com/ultraworkers/claw-code",
+    installLabel: "优先复用已有安装，必要时可从 GitHub clone 后接入。",
+    installMode: "existing",
     capabilities: ["stream", "tool-events", "finish"],
     status: "ready"
   },
@@ -354,6 +360,10 @@ const officialRuntimePlugins: RuntimePlugin[] = [
     supportMode: "deep",
     targetRuntime: "openclaw",
     pathHint: "plugins/runtimes/clones/openclaw",
+    githubUrl: "https://github.com/openclaw/openclaw",
+    installLabel: "适合直接从 GitHub 一键浅克隆并纳入平台调度。",
+    installMode: "clone",
+    shallowClone: true,
     capabilities: ["stream", "tool-events", "compact-detect", "finish", "daemon-hooks"],
     status: "degraded"
   }

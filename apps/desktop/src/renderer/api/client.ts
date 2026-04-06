@@ -1,4 +1,4 @@
-import type { AppBootstrap, Role, Task } from "@agentaction/shared";
+import type { AppBootstrap, Role, RuntimePlugin, Task } from "@agentaction/shared";
 
 const BASE_URL = "http://127.0.0.1:4318";
 
@@ -104,6 +104,11 @@ export const api = {
   },
   syncCloneBack(roleId: string) {
     return request<{ clone: Role; source: Role }>(`/api/roles/${roleId}/sync-back`, {
+      method: "POST"
+    });
+  },
+  installRuntimeFromGitHub(runtimeId: string) {
+    return request<RuntimePlugin>(`/api/runtimes/${runtimeId}/install-source`, {
       method: "POST"
     });
   },
