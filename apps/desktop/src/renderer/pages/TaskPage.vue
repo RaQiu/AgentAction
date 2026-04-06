@@ -140,7 +140,7 @@
           <div class="section-heading">
             <div>
               <p class="eyebrow">分享记录</p>
-              <h3>任务级分享，而不是共享整个工作台</h3>
+              <h3>当前任务的分享记录</h3>
             </div>
           </div>
           <ul class="list">

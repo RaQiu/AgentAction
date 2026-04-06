@@ -2,10 +2,10 @@
   <section class="page">
     <header class="control-hero">
       <div class="control-hero__copy">
-        <p class="eyebrow">总控大屏</p>
-        <h1>派遣角色、盯住任务、让默认智能体在后台持续接管。</h1>
+        <p class="eyebrow">任务大厅</p>
+        <h1>角色、任务和默认智能体都在这一页。</h1>
         <p class="page__lead">
-          AgentAction 不是普通问答页，而是一块正在值班的多智能体控制台。你先看到谁在值班、哪些任务在推进、哪个结果准备收束。
+          先看当前任务和角色状态，再进入编队和执行。首页重点是可读性和操作效率。
         </p>
         <div class="hero-actions hero-actions--inline">
           <RouterLink to="/runtimes" class="button button--primary">检查默认智能体</RouterLink>
@@ -15,7 +15,7 @@
 
       <div class="control-hero__board">
         <article class="control-hero__panel">
-          <p class="eyebrow">值班态势</p>
+          <p class="eyebrow">运行概览</p>
           <div class="ops-grid">
             <div class="ops-cell">
               <strong>{{ tasks.length }}</strong>
@@ -37,63 +37,49 @@
         </article>
 
         <article class="control-hero__panel control-hero__panel--log">
-          <p class="eyebrow">当前值班</p>
+          <p class="eyebrow">默认智能体</p>
           <ul class="watch-list">
-            <li v-for="role in heroRoles" :key="role.id">
-              <span class="watch-list__call">{{ role.nickname }}</span>
-              <strong>{{ role.displayName }}</strong>
-              <span>{{ role.persona }}</span>
+            <li>
+              <span class="watch-list__call">{{ defaultRuntimeReady ? "READY" : "CHECK" }}</span>
+              <strong>{{ defaultRuntimeName }}</strong>
+              <span>{{ defaultRuntimeReady ? "已通过真实检查" : "等待运行时检查" }}</span>
+            </li>
+            <li>
+              <span class="watch-list__call">TASK</span>
+              <strong>{{ latestTasks[0]?.title || "暂无任务" }}</strong>
+              <span>{{ latestTasks[0] ? statusLabelMap[latestTasks[0].status] : "创建任务后会显示在这里" }}</span>
             </li>
           </ul>
         </article>
       </div>
     </header>
 
-    <section class="mission-section">
+    <section class="dashboard-grid">
+      <section class="mission-section">
       <div class="section-heading section-heading--wide">
         <div>
-          <p class="eyebrow">角色值班带</p>
-          <h3>这些角色不是头像列表，而是当前可派遣的值班席位。</h3>
+          <p class="eyebrow">角色</p>
+          <h3>常用角色入口</h3>
         </div>
         <span class="tag tag--live">{{ defaultRuntimeReady ? "Codex 已在线" : "Codex 待检查" }}</span>
       </div>
       <div class="roster-grid">
         <RoleCard v-for="role in heroRoles" :key="role.id" :role="role" />
       </div>
-    </section>
+      </section>
 
-    <section class="mission-section">
+      <section class="mission-section">
       <div class="section-heading section-heading--wide">
         <div>
-          <p class="eyebrow">派遣任务海报</p>
-          <h3>先挑要完成的结果，再进轻量编队卡，不是先学命令。</h3>
+          <p class="eyebrow">任务模板</p>
+          <h3>先选任务，再进入轻量编队</h3>
         </div>
         <span class="tag">{{ templates.length }} 张任务海报</span>
       </div>
       <div class="template-grid">
         <TaskTemplateCard v-for="template in templates" :key="template.id" :template="template" />
       </div>
-    </section>
-
-    <section class="mission-section mission-section--summary">
-      <article class="summary-rail">
-        <p class="eyebrow">运行时总览</p>
-        <ul class="summary-rail__list">
-          <li v-for="runtime in runtimes" :key="runtime.id">
-            <strong>{{ runtime.name }}</strong>
-            <span>{{ runtime.checkSummary || runtime.status }}</span>
-          </li>
-        </ul>
-      </article>
-      <article class="summary-rail">
-        <p class="eyebrow">最新任务</p>
-        <ul class="summary-rail__list">
-          <li v-for="task in latestTasks" :key="task.id">
-            <strong>{{ task.title }}</strong>
-            <span>{{ statusLabelMap[task.status] }}</span>
-          </li>
-        </ul>
-      </article>
+      </section>
     </section>
   </section>
 </template>

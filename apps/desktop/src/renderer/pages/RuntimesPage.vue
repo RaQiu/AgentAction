@@ -4,7 +4,7 @@
       <div>
         <p class="eyebrow">运行时接入</p>
         <h1>已有安装 + hack 注入为主，clone 接入为补充。</h1>
-        <p class="page__lead">clone 和 hack 不是装备，它们属于平台的运行时插件。</p>
+        <p class="page__lead">这里管理智能体运行时、真实检查结果和 GitHub 接入状态。</p>
       </div>
     </header>
 

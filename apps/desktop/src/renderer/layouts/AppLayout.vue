@@ -8,14 +8,14 @@
         </div>
         <div class="brand__copy">
           <div class="brand__title">AgentAction</div>
-          <div class="brand__subtitle">多智能体派遣总控台</div>
-          <p class="brand__summary">默认智能体、角色编队、任务态势与结果闭环统一收束。</p>
+          <div class="brand__subtitle">多智能体任务工作台</div>
+          <p class="brand__summary">角色、任务、运行时和结果集中展示。</p>
         </div>
       </div>
 
       <section class="sidebar-cluster">
         <div class="sidebar-cluster__header">
-          <p class="eyebrow">值班总览</p>
+          <p class="eyebrow">当前状态</p>
           <span class="tag tag--live">{{ socketConnected ? "已连上 daemon" : "连接中" }}</span>
         </div>
         <div class="sidebar-metrics">
@@ -25,7 +25,7 @@
           </article>
           <article class="sidebar-metric">
             <strong>{{ roles.length }}</strong>
-            <span>值班角色</span>
+            <span>角色</span>
           </article>
           <article class="sidebar-metric">
             <strong>{{ activeRuntimeName }}</strong>
@@ -44,7 +44,7 @@
       </nav>
 
       <div class="sidebar__footer">
-        <p>任务是容器，角色是执行体，Codex 是默认值班智能体。</p>
+        <p>默认智能体：{{ activeRuntimeName }}</p>
       </div>
     </aside>
 
