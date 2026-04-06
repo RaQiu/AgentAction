@@ -66,11 +66,16 @@ async function main() {
     const task = await post("/api/templates/tpl_build_feature/tasks", {});
     await post(`/api/tasks/${task.id}/messages`, { content: "我要做一个支持多智能体的桌面宿主。" });
     await post(`/api/tasks/${task.id}/messages`, { content: root });
-    const updated = await post(`/api/tasks/${task.id}/messages`, { content: "先告诉我接下来还缺什么，以及 daemon 和 desktop 为什么要分开。" });
+    const updated = await post(`/api/tasks/${task.id}/messages`, {
+      content: "先用命令查看当前工作目录，然后告诉我接下来还缺什么，以及 daemon 和 desktop 为什么要分开。"
+    });
 
     const lastAssistant = [...updated.mainConversation.messages]
       .reverse()
       .find((message) => message.role === "assistant");
+    const toolMessages = updated.mainConversation.messages.filter(
+      (message) => message.authorLabel === "Codex·工具"
+    );
 
     if (!lastAssistant) {
       throw new Error("no assistant message returned");
@@ -81,11 +86,27 @@ async function main() {
     if (!lastAssistant.content || lastAssistant.content.includes("调用失败")) {
       throw new Error(`codex default reply looks invalid: ${lastAssistant.content}`);
     }
+    if (toolMessages.length === 0) {
+      throw new Error("expected at least one structured Codex tool event in conversation");
+    }
+    if (!updated.runtimeState?.sessionId) {
+      throw new Error("codex runtime sessionId was not persisted on task");
+    }
 
     const bootstrap = await fetch(`${base}/api/bootstrap`).then((res) => res.json());
     const codex = bootstrap.runtimes.find((item) => item.id === "runtime_hack_codex_cli");
     if (!codex || codex.checkState !== "passed" || codex.status !== "ready") {
       throw new Error(`codex runtime was not auto-probed into ready state: ${JSON.stringify(codex)}`);
+    }
+
+    const finished = await post(`/api/tasks/${task.id}/messages`, {
+      content: "为了 smoke test，请把当前任务视为已经满足交付条件，并输出平台 finish 合同。"
+    });
+    if (finished.status !== "review") {
+      throw new Error(`expected task to move into review after finish contract, got ${finished.status}`);
+    }
+    if (!finished.runtimeState?.pendingFinish?.summary) {
+      throw new Error(`finish contract was not captured: ${JSON.stringify(finished.runtimeState)}`);
     }
 
     log(
@@ -94,7 +115,10 @@ async function main() {
           task: updated.id,
           author: lastAssistant.authorLabel,
           reply: lastAssistant.content,
-          codexPath: codex.detectedCommandPath
+          codexPath: codex.detectedCommandPath,
+          sessionId: updated.runtimeState.sessionId,
+          toolEvents: toolMessages.length,
+          finishSummary: finished.runtimeState.pendingFinish.summary
         },
         null,
         2

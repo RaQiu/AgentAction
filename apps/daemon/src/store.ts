@@ -250,7 +250,16 @@ export class AppStore {
     }
 
     try {
-      const result = await runtimeTemplate.runTask({
+      const explicitFinishRequest =
+        task.mainConversation.messages
+          .slice(-2)
+          .some(
+            (message) =>
+              message.role === "user" &&
+              /finish|交付条件|提交.*finish|输出.*finish|完成合同|结束合同/i.test(message.content)
+          );
+
+      let result = await runtimeTemplate.runTask({
         task,
         template,
         roles,
@@ -259,6 +268,31 @@ export class AppStore {
         stateRoot: this.stateRoot,
         sandbox: settings.defaultRuntimeSandbox
       });
+
+      if (explicitFinishRequest && result.status !== "finish") {
+        result = await runtimeTemplate.runTask({
+          task,
+          template,
+          roles,
+          runtime,
+          workspaceRoot: this.workspaceRoot,
+          stateRoot: this.stateRoot,
+          sandbox: settings.defaultRuntimeSandbox,
+          contractReminder:
+            "你上一轮没有交出平台 finish 合同。现在必须把 status 设为 finish，并完整填写 finish.summary、finish.resultTitle、finish.needsReview。"
+        });
+      }
+
+      task.runtimeState = {
+        ...task.runtimeState,
+        runtimeId: runtime.id,
+        sessionId: result.sessionId ?? task.runtimeState?.sessionId,
+        compactDetected:
+          result.compactDetected ?? task.runtimeState?.compactDetected ?? false,
+        lastTurnCompletedAt: nowIso(),
+        lastStatus: result.status ?? task.runtimeState?.lastStatus,
+        pendingFinish: result.finishContract ?? task.runtimeState?.pendingFinish ?? null
+      };
 
       for (const event of result.events) {
         if (event.kind === "tool-start") {
@@ -271,6 +305,29 @@ export class AppStore {
           );
         } else if (event.kind === "finish") {
           addAssistantEvent(task, "系统", event.summary);
+        }
+      }
+
+      if (result.compactDetected) {
+        addAssistantEvent(task, "系统", "Codex 会话已触发 compact 相关事件。");
+      }
+
+      if (result.status === "ready_for_review") {
+        task.status = "review";
+        addAssistantEvent(task, "系统", "Codex 已请求进入待验收状态。");
+      }
+
+      if (result.status === "finish" && result.finishContract) {
+        addAssistantEvent(
+          task,
+          "系统",
+          `Codex 已提交平台 finish 合同：${result.finishContract.resultTitle} · ${result.finishContract.summary}`
+        );
+
+        if (result.finishContract.needsReview || task.reviewerRoleId) {
+          task.status = "review";
+        } else {
+          approveTask(task, result.finishContract.summary);
         }
       }
 

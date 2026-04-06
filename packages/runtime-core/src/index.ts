@@ -1,6 +1,8 @@
 import type {
   Role,
+  RuntimeFinishContract,
   RuntimePlugin,
+  RuntimeResponseStatus,
   RuntimeSupportMode,
   Task,
   TaskTemplatePlugin
@@ -59,12 +61,17 @@ export interface RuntimeTemplateTaskContext extends RuntimeTemplateCheckContext 
   roles: Role[];
   runtime: RuntimePlugin;
   sandbox: "read-only" | "workspace-write";
+  contractReminder?: string;
 }
 
 export interface RuntimeTemplateTaskResult {
   reply: string;
   authorLabel: string;
   events: RuntimeTemplateEvent[];
+  sessionId?: string;
+  compactDetected?: boolean;
+  status?: RuntimeResponseStatus;
+  finishContract?: RuntimeFinishContract | null;
 }
 
 export interface RuntimeTemplate {

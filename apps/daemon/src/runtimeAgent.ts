@@ -1,7 +1,14 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
-import type { Role, RuntimePlugin, Task, TaskTemplatePlugin } from "@agentaction/shared";
+import type {
+  Role,
+  RuntimeFinishContract,
+  RuntimePlugin,
+  RuntimeResponseStatus,
+  Task,
+  TaskTemplatePlugin
+} from "@agentaction/shared";
 import type { RuntimeTemplateEvent, RuntimeTemplateTaskResult } from "@agentaction/runtime-core";
 
 interface CodexExecutionConfig {
@@ -10,7 +17,15 @@ interface CodexExecutionConfig {
   roles: Role[];
   runtime: RuntimePlugin;
   workspaceRoot: string;
+  stateRoot: string;
   sandbox: "read-only" | "workspace-write";
+  contractReminder?: string;
+}
+
+interface CodexStructuredOutput {
+  reply: string;
+  status: RuntimeResponseStatus;
+  finish: RuntimeFinishContract | null;
 }
 
 function existingPathCandidate(values: string[]): string | undefined {
@@ -27,7 +42,12 @@ function existingPathCandidate(values: string[]): string | undefined {
   return undefined;
 }
 
-function buildPrompt(task: Task, template: TaskTemplatePlugin | undefined, roles: Role[]): string {
+function buildPrompt(
+  task: Task,
+  template: TaskTemplatePlugin | undefined,
+  roles: Role[],
+  contractReminder?: string
+): string {
   const roleNames = task.roleSelections
     .map((selection) => roles.find((role) => role.id === selection.roleId)?.displayName)
     .filter(Boolean)
@@ -50,9 +70,16 @@ function buildPrompt(task: Task, template: TaskTemplatePlugin | undefined, roles
     `未收集资料：${task.requiredMaterials
       .filter((item) => !task.collectedMaterials.includes(item))
       .join(" | ") || "无"}`,
+    `当前运行时会话：${task.runtimeState?.sessionId ?? "无"}`,
     "最近会话：",
     recentMessages,
-    "如果信息不足，明确点名缺什么；如果信息足够，直接给推进结果。回答尽量控制在 200 中文字以内。"
+    "你必须返回结构化 JSON：reply、status、finish。",
+    "status 只能是 continue / needs_input / ready_for_review / finish。",
+    "当 status=finish 时，finish 不能为 null，必须给出 summary/resultTitle/needsReview。",
+    "当 status 不是 finish 时，finish 必须为 null。",
+    "如果你只是本轮原生完成但还没给出平台 finish 合同，不要偷懒，继续给出我们要的 finish 字段。",
+    "reply 依然用中文，保持直接、具体、能继续推进任务。",
+    contractReminder ?? ""
   ]
     .filter(Boolean)
     .join("\n");
@@ -68,23 +95,39 @@ function safeJsonParse(line: string): Record<string, unknown> | null {
 
 export async function runCodexTaskReply(config: CodexExecutionConfig): Promise<RuntimeTemplateTaskResult> {
   const workdirCandidate = existingPathCandidate(config.task.collectedMaterials) ?? config.workspaceRoot;
-  const prompt = buildPrompt(config.task, config.template, config.roles);
+  const prompt = buildPrompt(config.task, config.template, config.roles, config.contractReminder);
+  const schemaPath = path.join(config.workspaceRoot, "scripts", "codex-task-schema.json");
 
-  const args = [
-    "exec",
-    "--skip-git-repo-check",
-    "--sandbox",
-    config.sandbox,
-    "--json",
-    "-C",
-    workdirCandidate,
-    prompt
-  ];
+  const args = config.task.runtimeState?.sessionId
+    ? [
+        "exec",
+        "resume",
+        config.task.runtimeState.sessionId,
+        "--skip-git-repo-check",
+        "--json",
+        prompt
+      ]
+    : [
+        "exec",
+        "--skip-git-repo-check",
+        "--sandbox",
+        config.sandbox,
+        "--json",
+        "--output-schema",
+        schemaPath,
+        "-C",
+        workdirCandidate,
+        prompt
+      ];
 
   const events: RuntimeTemplateEvent[] = [];
   let stderr = "";
   let stdoutBuffer = "";
   let reply = "";
+  let sessionId = config.task.runtimeState?.sessionId;
+  let compactDetected = false;
+  let status: RuntimeResponseStatus | undefined;
+  let finishContract: RuntimeFinishContract | null = null;
 
   await new Promise<void>((resolve, reject) => {
     const child = spawn(config.runtime.command ?? "codex", args, {
@@ -108,6 +151,7 @@ export async function runCodexTaskReply(config: CodexExecutionConfig): Promise<R
         }
 
         if (parsed.type === "thread.started") {
+          sessionId = typeof parsed.thread_id === "string" ? parsed.thread_id : sessionId;
           events.push({
             kind: "thread",
             rawType: parsed.type,
@@ -128,25 +172,33 @@ export async function runCodexTaskReply(config: CodexExecutionConfig): Promise<R
           if (item.type === "command_execution") {
             const command = typeof item.command === "string" ? item.command : "";
             const output = typeof item.aggregated_output === "string" ? item.aggregated_output.trim() : "";
+            const exitCode = typeof item.exit_code === "number" ? item.exit_code : null;
             events.push({
               kind: parsed.type === "item.started" ? "tool-start" : "tool-end",
               rawType: parsed.type,
               summary:
                 parsed.type === "item.started"
                   ? `Codex 正在调用命令：${command}`
-                  : `Codex 命令完成：${command}`,
+                  : `Codex 命令完成：${command}${exitCode === null ? "" : `（exit=${exitCode}）`}`,
               command,
               output
             });
           } else if (item.type === "agent_message") {
             const text = typeof item.text === "string" ? item.text.trim() : "";
             if (text) {
-              reply = text;
+              try {
+                const parsedText = JSON.parse(text) as CodexStructuredOutput;
+                reply = parsedText.reply;
+                status = parsedText.status;
+                finishContract = parsedText.finish;
+              } catch {
+                reply = text;
+              }
               events.push({
                 kind: "agent-message",
                 rawType: parsed.type,
                 summary: "Codex 已产出最终回复",
-                output: text
+                output: reply
               });
             }
           }
@@ -157,6 +209,7 @@ export async function runCodexTaskReply(config: CodexExecutionConfig): Promise<R
             summary: "Codex 本轮执行完成"
           });
         } else if (parsed.type.includes("compact")) {
+          compactDetected = true;
           events.push({
             kind: "turn",
             rawType: parsed.type,
@@ -179,6 +232,10 @@ export async function runCodexTaskReply(config: CodexExecutionConfig): Promise<R
   return {
     reply,
     authorLabel: "Codex",
-    events
+    events,
+    sessionId,
+    compactDetected,
+    status,
+    finishContract
   };
 }

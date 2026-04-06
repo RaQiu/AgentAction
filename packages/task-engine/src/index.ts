@@ -74,7 +74,12 @@ export function createTaskFromTemplate(
     requiredMaterials: template.requiredMaterials,
     collectedMaterials: [],
     reviewerRoleId: template.recommendedRoleIds[0],
-    finishRequired: true
+    finishRequired: true,
+    runtimeState: {
+      runtimeId: "runtime_hack_codex_cli",
+      compactDetected: false,
+      pendingFinish: null
+    }
   };
 }
 

@@ -127,6 +127,7 @@ export interface ConversationMessage {
   createdAt: string;
   eventType?: EventType;
   folded?: boolean;
+  meta?: Record<string, unknown>;
 }
 
 export interface QueuedMessage {
@@ -194,6 +195,23 @@ export interface TaskTemplatePlugin {
   scenarioSteps: string[];
 }
 
+export type RuntimeResponseStatus = "continue" | "needs_input" | "ready_for_review" | "finish";
+
+export interface RuntimeFinishContract {
+  summary: string;
+  resultTitle: string;
+  needsReview: boolean;
+}
+
+export interface TaskRuntimeState {
+  runtimeId?: string;
+  sessionId?: string;
+  compactDetected?: boolean;
+  lastTurnCompletedAt?: string;
+  lastStatus?: RuntimeResponseStatus;
+  pendingFinish?: RuntimeFinishContract | null;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -214,6 +232,7 @@ export interface Task {
   collectedMaterials: string[];
   reviewerRoleId?: string;
   finishRequired: boolean;
+  runtimeState?: TaskRuntimeState;
 }
 
 export interface AppBootstrap {
