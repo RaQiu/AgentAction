@@ -2,19 +2,46 @@
   <section class="page">
     <header class="page__hero page__hero--compact">
       <div>
-        <p class="eyebrow">设置</p>
-        <h1>provider 抽象、代理分流和升级边界都在这里落说明。</h1>
-        <p class="page__lead">
-          首发优先远程模型作为后台机械工，Ollama 与 ktransformers 先作为可配置 provider 保留入口。
-        </p>
+        <p class="eyebrow">{{ t("settings.title") }}</p>
+        <h1>{{ t("settings.title") }}</h1>
+        <p class="page__lead">{{ t("settings.subtitle") }}</p>
       </div>
     </header>
 
     <section class="template-grid">
+      <article class="card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">{{ t("settings.language") }}</p>
+            <h3>{{ t("settings.language") }}</h3>
+          </div>
+        </div>
+        <p class="muted">{{ t("settings.languageDesc") }}</p>
+        <div class="composer__actions">
+          <button class="button button--ghost" @click="shell.setLocale('zh-CN')">中文</button>
+          <button class="button button--ghost" @click="shell.setLocale('en-US')">English</button>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">{{ t("settings.onboarding") }}</p>
+            <h3>{{ t("settings.onboarding") }}</h3>
+          </div>
+        </div>
+        <p class="muted">{{ t("settings.onboardingDesc") }}</p>
+        <div class="composer__actions">
+          <button class="button button--primary" @click="shell.resetOnboarding()">
+            {{ t("settings.onboardingReset") }}
+          </button>
+        </div>
+      </article>
+
       <article v-for="provider in providers" :key="provider.id" class="card">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">{{ provider.kind }}</p>
+            <p class="eyebrow">{{ t("settings.providers") }}</p>
             <h3>{{ provider.name }}</h3>
           </div>
           <span class="tag">{{ provider.enabled ? "启用" : "未启用" }}</span>
@@ -45,9 +72,13 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
+import { useI18n } from "@/i18n";
+import { useShellStore } from "@/stores/shell";
 import { useWorkbenchStore } from "@/stores/workbench";
 
 const store = useWorkbenchStore();
+const shell = useShellStore();
+const { t } = useI18n();
 
 onMounted(() => {
   store.ensureInitialized();

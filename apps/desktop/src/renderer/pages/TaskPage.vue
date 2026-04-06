@@ -2,39 +2,39 @@
   <section v-if="task" class="page task-page">
     <header class="task-command">
       <div class="task-command__copy">
-        <p class="eyebrow">任务容器</p>
-        <h1>{{ task.title }}</h1>
+        <p class="eyebrow">{{ t("shell.tasks") }}</p>
+        <h1>{{ task.templateId ? templateField(task.templateId, "title", task.title) : task.title }}</h1>
         <p class="page__lead">
-          {{ statusLabelMap[task.status] }} · 默认智能体 {{ task.runtimeState?.runtimeId || "未接管" }} · finish 纪律 {{ task.finishRequired ? "开启" : "关闭" }}
+          {{ statusLabelMap[task.status] }} · {{ t("task.runtime") }} {{ task.runtimeState?.runtimeId || "—" }} · {{ t("task.finishDiscipline") }} {{ task.finishRequired ? t("task.enabled") : t("task.disabled") }}
         </p>
       </div>
       <div class="hero-actions">
-        <button class="button button--ghost" @click="share">分享</button>
-        <button class="button button--ghost" @click="requestReview">送审</button>
-        <button class="button button--ghost" @click="rejectReview">打回</button>
-        <button class="button button--primary" @click="finish">finish</button>
+        <button class="button button--ghost" @click="share">{{ t("task.share") }}</button>
+        <button class="button button--ghost" @click="requestReview">{{ t("task.requestReview") }}</button>
+        <button class="button button--ghost" @click="rejectReview">{{ t("task.reject") }}</button>
+        <button class="button button--primary" @click="finish">{{ t("task.finish") }}</button>
       </div>
     </header>
 
     <section class="task-stage-grid">
       <article class="task-stage">
-        <p class="eyebrow">运行态势</p>
+        <p class="eyebrow">{{ t("task.status") }}</p>
         <div class="ops-grid ops-grid--compact">
           <div class="ops-cell">
             <strong>{{ task.mainConversation.messages.length }}</strong>
-            <span>事件/消息</span>
+            <span>{{ t("task.events") }}</span>
           </div>
           <div class="ops-cell">
-            <strong>{{ task.runtimeState?.sessionId ? "已接住" : "未持久化" }}</strong>
-            <span>Codex 会话</span>
+            <strong>{{ task.runtimeState?.sessionId ? t("task.sessionReady") : t("task.sessionMissing") }}</strong>
+            <span>{{ t("task.session") }}</span>
           </div>
           <div class="ops-cell">
-            <strong>{{ task.runtimeState?.compactDetected ? "已发现" : "未发现" }}</strong>
-            <span>compact</span>
+            <strong>{{ task.runtimeState?.compactDetected ? t("task.compactSeen") : t("task.compactNone") }}</strong>
+            <span>{{ t("task.compact") }}</span>
           </div>
           <div class="ops-cell">
-            <strong>{{ task.runtimeState?.pendingFinish ? "已提交" : "待提交" }}</strong>
-            <span>finish 合同</span>
+            <strong>{{ task.runtimeState?.pendingFinish ? t("task.contractReady") : t("task.contractPending") }}</strong>
+            <span>{{ t("task.contract") }}</span>
           </div>
         </div>
       </article>
@@ -52,8 +52,8 @@
       <article class="workspace-panel">
         <div class="section-heading">
           <div>
-            <p class="eyebrow">主工作区</p>
-            <h3>主回复、工具事件、系统节点分层展示</h3>
+            <p class="eyebrow">{{ t("task.workspace") }}</p>
+            <h3>{{ t("task.workspaceSubtitle") }}</h3>
           </div>
           <span class="tag">{{ task.mainConversation.messages.length }} 条</span>
         </div>
@@ -74,11 +74,11 @@
         </div>
 
         <div class="composer composer--command">
-          <textarea v-model="messageText" placeholder="继续给主任务补资料、发指令，或要求 Codex 提交 finish 合同..." />
+          <textarea v-model="messageText" :placeholder="t('task.composerPlaceholder')" />
           <div class="composer__actions">
-            <button class="button button--ghost" @click="queue">排队插话</button>
-            <button class="button button--ghost" @click="branch">显式 /btw</button>
-            <button class="button button--primary" @click="send">发到主线</button>
+            <button class="button button--ghost" @click="queue">{{ t("task.queue") }}</button>
+            <button class="button button--ghost" @click="branch">{{ t("task.branch") }}</button>
+            <button class="button button--primary" @click="send">{{ t("task.send") }}</button>
           </div>
         </div>
       </article>
@@ -89,8 +89,8 @@
         <section class="mission-stack">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">旁枝线程</p>
-              <h3>显式 /btw 才开分叉</h3>
+              <p class="eyebrow">{{ t("task.sideThreads") }}</p>
+              <h3>{{ t("task.sideThreadsSubtitle") }}</h3>
             </div>
             <span class="tag">{{ task.branches.length }} 条</span>
           </div>
@@ -100,23 +100,23 @@
               <p>{{ branchItem.messages[branchItem.messages.length - 1]?.content }}</p>
             </article>
           </div>
-          <p v-else class="muted">当前没有旁枝。</p>
+          <p v-else class="muted">{{ t("task.noBranch") }}</p>
         </section>
 
         <section class="mission-stack mission-stack--contract">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">交付合同</p>
-              <h3>平台 finish 字段</h3>
+              <p class="eyebrow">{{ t("task.contractTitle") }}</p>
+              <h3>{{ t("task.contractSubtitle") }}</h3>
             </div>
             <span class="tag">{{ task.runtimeState?.lastStatus || "未提交" }}</span>
           </div>
           <div v-if="task.runtimeState?.pendingFinish" class="contract-sheet">
             <strong>{{ task.runtimeState.pendingFinish.resultTitle }}</strong>
             <p>{{ task.runtimeState.pendingFinish.summary }}</p>
-            <span class="tag">{{ task.runtimeState.pendingFinish.needsReview ? "需要主审" : "可直接收束" }}</span>
+            <span class="tag">{{ task.runtimeState.pendingFinish.needsReview ? t("task.needsReview") : t("task.directFinish") }}</span>
           </div>
-          <p v-else class="muted">默认智能体尚未提交平台 finish 合同。</p>
+          <p v-else class="muted">{{ t("task.contractEmpty") }}</p>
         </section>
 
         <ResultCardPanel :task="task" @extract="extract" />
@@ -124,8 +124,8 @@
         <section class="mission-stack">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">现场资产</p>
-              <h3>不跳后台，直接从任务流里提炼</h3>
+              <p class="eyebrow">{{ t("task.assets") }}</p>
+              <h3>{{ t("task.assetsSubtitle") }}</h3>
             </div>
           </div>
           <ul class="list">
@@ -139,8 +139,8 @@
         <section class="mission-stack">
           <div class="section-heading">
             <div>
-              <p class="eyebrow">分享记录</p>
-              <h3>当前任务的分享记录</h3>
+              <p class="eyebrow">{{ t("task.shares") }}</p>
+              <h3>{{ t("task.sharesSubtitle") }}</h3>
             </div>
           </div>
           <ul class="list">
@@ -159,12 +159,14 @@
 import { computed, onMounted, ref } from "vue";
 import type { ConversationMessage, QueuedMessage, TaskStatus } from "@agentaction/shared";
 import { useRoute } from "vue-router";
+import { useI18n } from "@/i18n";
 import QueuePanel from "@/components/QueuePanel.vue";
 import ResultCardPanel from "@/components/ResultCardPanel.vue";
 import { useWorkbenchStore } from "@/stores/workbench";
 
 const route = useRoute();
 const store = useWorkbenchStore();
+const { t, templateField } = useI18n();
 const messageText = ref("");
 
 const statusLabelMap: Record<TaskStatus, string> = {

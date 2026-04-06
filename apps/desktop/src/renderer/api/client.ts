@@ -1,11 +1,31 @@
 import type { AppBootstrap, Role, RuntimePlugin, Task } from "@agentaction/shared";
 
 const BASE_URL = "http://127.0.0.1:4318";
+const SHELL_STORAGE_KEY = "agentaction-shell-state-v1";
+
+function currentLocale(): string {
+  if (typeof window === "undefined") {
+    return "zh-CN";
+  }
+
+  const raw = window.localStorage.getItem(SHELL_STORAGE_KEY);
+  if (!raw) {
+    return "zh-CN";
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as { locale?: string };
+    return parsed.locale === "en-US" ? "en-US" : "zh-CN";
+  } catch {
+    return "zh-CN";
+  }
+}
 
 async function request<T>(pathname: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${BASE_URL}${pathname}`, {
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "x-agentaction-locale": currentLocale()
     },
     ...init
   });

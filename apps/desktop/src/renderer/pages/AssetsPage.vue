@@ -2,33 +2,33 @@
   <section class="page">
     <header class="page__hero page__hero--compact">
       <div>
-        <p class="eyebrow">结果与资产</p>
-        <h1>主视角按任务，但也能按角色和类型继续找回资产。</h1>
+        <p class="eyebrow">{{ t("assets.title") }}</p>
+        <h1>{{ t("assets.subtitle") }}</h1>
       </div>
     </header>
 
     <article class="card">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">资产索引</p>
-          <h3>默认按任务找，也能按角色和类型过滤</h3>
+          <p class="eyebrow">{{ t("assets.title") }}</p>
+          <h3>{{ t("assets.subtitle") }}</h3>
         </div>
         <span class="tag">{{ filteredAssets.length }} / {{ assets.length }} 项</span>
       </div>
       <div class="composer__actions">
         <select v-model="taskFilter" class="select">
-          <option value="">全部任务</option>
+          <option value="">{{ t("assets.filters.tasks") }}</option>
           <option v-for="task in tasks" :key="task.id" :value="task.id">{{ task.title }}</option>
         </select>
         <select v-model="roleFilter" class="select">
-          <option value="">全部角色</option>
-          <option v-for="role in roles" :key="role.id" :value="role.id">{{ role.displayName }}</option>
+          <option value="">{{ t("assets.filters.roles") }}</option>
+          <option v-for="role in roles" :key="role.id" :value="role.id">{{ roleDisplayName(role.id, role.displayName) }}</option>
         </select>
         <select v-model="kindFilter" class="select">
-          <option value="">全部类型</option>
-          <option value="artifact">产物</option>
-          <option value="memory">记忆</option>
-          <option value="skill">技能</option>
+          <option value="">{{ t("assets.filters.kinds") }}</option>
+          <option value="artifact">{{ t("assets.kind.artifact") }}</option>
+          <option value="memory">{{ t("assets.kind.memory") }}</option>
+          <option value="skill">{{ t("assets.kind.skill") }}</option>
         </select>
       </div>
       <ul class="list">
@@ -43,9 +43,11 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import { useI18n } from "@/i18n";
 import { useWorkbenchStore } from "@/stores/workbench";
 
 const store = useWorkbenchStore();
+const { t, roleDisplayName } = useI18n();
 const taskFilter = ref("");
 const roleFilter = ref("");
 const kindFilter = ref("");

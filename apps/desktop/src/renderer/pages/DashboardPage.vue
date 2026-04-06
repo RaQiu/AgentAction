@@ -2,20 +2,18 @@
   <section class="page">
     <header class="control-hero">
       <div class="control-hero__copy">
-        <p class="eyebrow">任务大厅</p>
-        <h1>角色、任务和默认智能体都在这一页。</h1>
-        <p class="page__lead">
-          先看当前任务和角色状态，再进入编队和执行。首页重点是可读性和操作效率。
-        </p>
+        <p class="eyebrow">{{ t("nav.dashboard") }}</p>
+        <h1>{{ t("home.title") }}</h1>
+        <p class="page__lead">{{ t("home.subtitle") }}</p>
         <div class="hero-actions hero-actions--inline">
-          <RouterLink to="/runtimes" class="button button--primary">检查默认智能体</RouterLink>
-          <RouterLink to="/roles" class="button button--ghost">查看角色编队</RouterLink>
+          <RouterLink to="/runtimes" class="button button--primary">{{ t("home.primaryCta") }}</RouterLink>
+          <RouterLink to="/roles" class="button button--ghost">{{ t("home.secondaryCta") }}</RouterLink>
         </div>
       </div>
 
       <div class="control-hero__board">
         <article class="control-hero__panel">
-          <p class="eyebrow">运行概览</p>
+          <p class="eyebrow">{{ t("home.overview") }}</p>
           <div class="ops-grid">
             <div class="ops-cell">
               <strong>{{ tasks.length }}</strong>
@@ -23,31 +21,31 @@
             </div>
             <div class="ops-cell">
               <strong>{{ runningTasks }}</strong>
-              <span>执行中</span>
+              <span>{{ t("home.running") }}</span>
             </div>
             <div class="ops-cell">
               <strong>{{ reviewTasks }}</strong>
-              <span>待验收</span>
+              <span>{{ t("home.review") }}</span>
             </div>
             <div class="ops-cell">
               <strong>{{ defaultRuntimeName }}</strong>
-              <span>默认智能体</span>
+              <span>{{ t("shell.defaultRuntime") }}</span>
             </div>
           </div>
         </article>
 
         <article class="control-hero__panel control-hero__panel--log">
-          <p class="eyebrow">默认智能体</p>
+          <p class="eyebrow">{{ t("home.defaultRuntimePanel") }}</p>
           <ul class="watch-list">
             <li>
               <span class="watch-list__call">{{ defaultRuntimeReady ? "READY" : "CHECK" }}</span>
               <strong>{{ defaultRuntimeName }}</strong>
-              <span>{{ defaultRuntimeReady ? "已通过真实检查" : "等待运行时检查" }}</span>
+              <span>{{ defaultRuntimeReady ? t("home.runtimeReady") : t("home.runtimePending") }}</span>
             </li>
             <li>
               <span class="watch-list__call">TASK</span>
-              <strong>{{ latestTasks[0]?.title || "暂无任务" }}</strong>
-              <span>{{ latestTasks[0] ? statusLabelMap[latestTasks[0].status] : "创建任务后会显示在这里" }}</span>
+              <strong>{{ latestTasks[0]?.templateId ? templateField(latestTasks[0].templateId, "title", latestTasks[0].title) : (latestTasks[0]?.title || t("home.noTask")) }}</strong>
+              <span>{{ latestTasks[0] ? statusLabelMap[latestTasks[0].status] : t("home.noTaskDesc") }}</span>
             </li>
           </ul>
         </article>
@@ -58,10 +56,10 @@
       <section class="mission-section">
       <div class="section-heading section-heading--wide">
         <div>
-          <p class="eyebrow">角色</p>
-          <h3>常用角色入口</h3>
+          <p class="eyebrow">{{ t("home.roles") }}</p>
+          <h3>{{ t("home.rolesSubtitle") }}</h3>
         </div>
-        <span class="tag tag--live">{{ defaultRuntimeReady ? "Codex 已在线" : "Codex 待检查" }}</span>
+        <span class="tag tag--live">{{ defaultRuntimeReady ? t("home.runtimeReady") : t("home.runtimePending") }}</span>
       </div>
       <div class="roster-grid">
         <RoleCard v-for="role in heroRoles" :key="role.id" :role="role" />
@@ -71,10 +69,10 @@
       <section class="mission-section">
       <div class="section-heading section-heading--wide">
         <div>
-          <p class="eyebrow">任务模板</p>
-          <h3>先选任务，再进入轻量编队</h3>
+          <p class="eyebrow">{{ t("home.templates") }}</p>
+          <h3>{{ t("home.templatesSubtitle") }}</h3>
         </div>
-        <span class="tag">{{ templates.length }} 张任务海报</span>
+        <span class="tag">{{ templates.length }}</span>
       </div>
       <div class="template-grid">
         <TaskTemplateCard v-for="template in templates" :key="template.id" :template="template" />
@@ -88,11 +86,13 @@
 import { computed, onMounted } from "vue";
 import type { TaskStatus } from "@agentaction/shared";
 import { RouterLink } from "vue-router";
+import { useI18n } from "@/i18n";
 import RoleCard from "@/components/RoleCard.vue";
 import TaskTemplateCard from "@/components/TaskTemplateCard.vue";
 import { useWorkbenchStore } from "@/stores/workbench";
 
 const store = useWorkbenchStore();
+const { t, templateField, runtimeField } = useI18n();
 
 const statusLabelMap: Record<TaskStatus, string> = {
   collecting: "收资料",
@@ -115,7 +115,7 @@ const reviewTasks = computed(() => tasks.value.filter((task) => task.status === 
 const latestTasks = computed(() => tasks.value.slice(0, 4));
 const defaultRuntimeName = computed(() => {
   const runtime = runtimes.value.find((item) => item.id === store.settings?.defaultRuntimeId);
-  return runtime?.name ?? "未设";
+  return runtime ? runtimeField(runtime.id, "name", runtime.name) : "—";
 });
 const defaultRuntimeReady = computed(() => {
   const runtime = runtimes.value.find((item) => item.id === store.settings?.defaultRuntimeId);
