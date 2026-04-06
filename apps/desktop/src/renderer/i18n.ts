@@ -105,6 +105,8 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "dispatch.outputTitle": "预计主结果",
     "dispatch.followup": "资料不足时，系统会继续追问。",
     "dispatch.caseAction": "进入任务",
+    "dispatch.roleProductHint": "收需求 · 做主审",
+    "dispatch.roleEngineerHint": "做实现 · 持续修正",
 
     "task.runtime": "当前助手",
     "task.finishDiscipline": "交付状态",
@@ -310,6 +312,8 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "dispatch.outputTitle": "Expected Main Result",
     "dispatch.followup": "If materials are missing, the system keeps asking next.",
     "dispatch.caseAction": "Open Task",
+    "dispatch.roleProductHint": "Clarify · Review",
+    "dispatch.roleEngineerHint": "Build · Repair",
 
     "task.runtime": "Current Assistant",
     "task.finishDiscipline": "Delivery Status",

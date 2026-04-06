@@ -32,24 +32,26 @@
             </div>
             <div class="dispatch-role-tile__body">
               <strong>{{ roleDisplayName(role.id, role.displayName) }}</strong>
-              <span>{{ rolePersona(role.id, role.persona) }}</span>
+              <span>{{ dispatchRoleHint(role.id) }}</span>
             </div>
           </article>
         </div>
 
-        <div class="dispatch-output">
-          <p class="eyebrow">{{ t("dispatch.outputTitle") }}</p>
-          <strong>{{ templateField(template.id, "outcomeTitle", template.outcomeTitle) }}</strong>
-        </div>
+        <div class="dispatch-footer-strip">
+          <div class="dispatch-output">
+            <p class="eyebrow">{{ t("dispatch.outputTitle") }}</p>
+            <strong>{{ templateField(template.id, "outcomeTitle", template.outcomeTitle) }}</strong>
+          </div>
 
-        <div class="dispatch-chip-cloud">
-          <span
-            v-for="item in recommendedEquipment"
-            :key="item.id"
-            class="dispatch-chip"
-          >
-            {{ item.name }}
-          </span>
+          <div class="dispatch-chip-cloud">
+            <span
+              v-for="item in recommendedEquipment"
+              :key="item.id"
+              class="dispatch-chip"
+            >
+              {{ item.name }}
+            </span>
+          </div>
         </div>
       </article>
 
@@ -113,6 +115,13 @@ const recommendedEquipment = computed(() =>
     template.value?.recommendedEquipmentIds.includes(equipment.id)
   )
 );
+
+function dispatchRoleHint(roleId: string) {
+  if (roleId === "role_product_xiaoce") {
+    return t("dispatch.roleProductHint");
+  }
+  return t("dispatch.roleEngineerHint");
+}
 
 async function startTask() {
   if (!template.value) {
