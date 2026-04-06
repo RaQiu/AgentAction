@@ -6,6 +6,7 @@ import { createServer } from "node:http";
 import type { EventEnvelope, Task } from "@agentaction/shared";
 import { createId, nowIso } from "@agentaction/shared";
 import { AppStore } from "./store";
+import { daemonText, readLocale } from "./locale";
 
 const app = express();
 const server = createServer(app);
@@ -64,7 +65,8 @@ app.get("/api/tasks/:taskId", (req, res) => {
 
 app.post("/api/templates/:templateId/tasks", (req, res) => {
   try {
-    const task = store.createTask(req.params.templateId, req.body?.roleSelections);
+    const locale = readLocale(String(req.headers["x-agentaction-locale"] ?? ""));
+    const task = store.createTask(req.params.templateId, req.body?.roleSelections, locale);
     emitTaskSnapshot("task.created", task);
     res.status(201).json(task);
   } catch (error) {
@@ -74,10 +76,12 @@ app.post("/api/templates/:templateId/tasks", (req, res) => {
 
 app.post("/api/tasks/:taskId/messages", async (req, res) => {
   try {
+    const locale = readLocale(String(req.headers["x-agentaction-locale"] ?? ""));
     const task = await store.sendMainMessage(
       req.params.taskId,
       String(req.body?.content ?? ""),
-      req.body?.authorLabel ?? "你"
+      req.body?.authorLabel ?? daemonText(locale).you,
+      locale
     );
     emitTaskSnapshot("conversation.delta", task);
     res.json(task);
@@ -88,10 +92,11 @@ app.post("/api/tasks/:taskId/messages", async (req, res) => {
 
 app.post("/api/tasks/:taskId/queue", (req, res) => {
   try {
+    const locale = readLocale(String(req.headers["x-agentaction-locale"] ?? ""));
     const result = store.queueMessage(
       req.params.taskId,
       String(req.body?.content ?? ""),
-      req.body?.from ?? "协作者"
+      req.body?.from ?? daemonText(locale).collaborator
     );
     emitTaskSnapshot("conversation.queue.enqueued", result.task);
     res.status(201).json(result);
@@ -142,7 +147,9 @@ app.post("/api/tasks/:taskId/review/request", (req, res) => {
 
 app.post("/api/tasks/:taskId/review/reject", (req, res) => {
   try {
-    const task = store.rejectReview(req.params.taskId, String(req.body?.feedback ?? "请继续完善"));
+    const locale = readLocale(String(req.headers["x-agentaction-locale"] ?? ""));
+    const fallback = locale === "en-US" ? "Please keep improving the result." : "请继续完善";
+    const task = store.rejectReview(req.params.taskId, String(req.body?.feedback ?? fallback));
     emitTaskSnapshot("review.rejected", task);
     res.json(task);
   } catch (error) {
@@ -152,7 +159,8 @@ app.post("/api/tasks/:taskId/review/reject", (req, res) => {
 
 app.post("/api/tasks/:taskId/finish", (req, res) => {
   try {
-    const task = store.finishTask(req.params.taskId);
+    const locale = readLocale(String(req.headers["x-agentaction-locale"] ?? ""));
+    const task = store.finishTask(req.params.taskId, locale);
     emitTaskSnapshot("finish.confirmed", task);
     res.json(task);
   } catch (error) {
@@ -182,10 +190,12 @@ app.post("/api/tasks/:taskId/share", (req, res) => {
 
 app.post("/api/tasks/:taskId/extract/:kind", (req, res) => {
   try {
+    const locale = readLocale(String(req.headers["x-agentaction-locale"] ?? ""));
     const task = store.extractTaskAsset(
       req.params.taskId,
       req.params.kind as "artifact" | "memory" | "skill",
-      req.body?.roleId
+      req.body?.roleId,
+      locale
     );
     emitTaskSnapshot(
       req.params.kind === "artifact"

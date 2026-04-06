@@ -8,11 +8,11 @@
       <div class="language-grid">
         <button class="language-card" @click="$emit('select', 'zh-CN')">
           <strong>{{ t("language.zh") }}</strong>
-          <span>简体中文</span>
+          <span>{{ t("language.zh") }}</span>
         </button>
         <button class="language-card" @click="$emit('select', 'en-US')">
           <strong>{{ t("language.en") }}</strong>
-          <span>English</span>
+          <span>{{ t("language.en") }}</span>
         </button>
       </div>
     </article>

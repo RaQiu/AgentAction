@@ -5,7 +5,7 @@
         <p class="eyebrow">{{ t("queue.title") }}</p>
         <h3>{{ t("queue.subtitle") }}</h3>
       </div>
-      <span class="tag">{{ queue.length }} 条</span>
+      <span class="tag">{{ t("common.items", { count: queue.length }) }}</span>
     </div>
 
     <ul v-if="queue.length" class="queue-panel__list">

@@ -39,7 +39,7 @@
       <article class="flat-panel flat-panel--narrow">
         <div class="flat-panel__header">
           <div>
-            <p class="eyebrow">接入目录</p>
+            <p class="eyebrow">{{ t("runtimes.directory") }}</p>
           </div>
         </div>
         <ul class="flat-list flat-list--compact">

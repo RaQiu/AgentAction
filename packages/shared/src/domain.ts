@@ -1,4 +1,5 @@
 export type SurfaceOrigin = "desktop" | "feishu" | "share-link" | "api";
+export type AppLocale = "zh-CN" | "en-US";
 
 export type TaskStatus = "collecting" | "running" | "review" | "done";
 

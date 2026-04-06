@@ -27,6 +27,13 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "language.subtitle": "首次进入先选择语言，当前只支持中文和英文。",
     "language.zh": "中文",
     "language.en": "English",
+    "common.back": "返回",
+    "common.items": "{count} 项",
+    "common.none": "—",
+    "status.collecting": "收资料",
+    "status.running": "执行中",
+    "status.review": "待验收",
+    "status.done": "已完成",
 
     "onboarding.step": "新手引导 {current}/{total}",
     "onboarding.skip": "跳过引导",
@@ -69,6 +76,15 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "home.latestTask": "最近任务",
     "home.noTask": "暂无任务",
     "home.noTaskDesc": "创建任务后会显示在这里",
+    "home.roleProduct": "产品经理",
+    "home.roleEngineer": "程序员",
+    "home.stepAssigned": "接到任务",
+    "home.stepMaterials": "补齐资料",
+    "home.stepBattle": "结对 battle",
+    "home.stepDeliver": "准备交付",
+    "home.materialCount": "{count} 项已记录",
+    "home.progressing": "当前正在推进",
+    "home.waitingResult": "等待结果",
     "home.roles": "角色",
     "home.rolesSubtitle": "当前角色",
     "home.templates": "任务模板",
@@ -92,9 +108,12 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "task.share": "分享",
     "task.requestReview": "送审",
     "task.reject": "打回",
+    "task.rejectMessage": "当前结果还不够可交付，请继续完善。",
     "task.finish": "finish",
     "task.status": "进度",
     "task.events": "消息",
+    "task.systemLabel": "系统",
+    "task.toolLabel": "工具",
     "task.session": "当前对话",
     "task.sessionReady": "已连接",
     "task.sessionMissing": "未连接",
@@ -118,6 +137,8 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "task.contractEmpty": "当前还没有准备好的交付内容。",
     "task.needsReview": "需要主审",
     "task.directFinish": "可直接收束",
+    "task.goal": "收束目标",
+    "task.goalEmpty": "尚未收束",
     "task.assets": "现场资产",
     "task.assetsSubtitle": "从这次任务里收下来的东西",
     "task.shares": "分享记录",
@@ -157,7 +178,28 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "settings.onboarding": "新手引导",
     "settings.onboardingDesc": "可以重新查看引导页。",
     "settings.onboardingReset": "重新打开新手引导",
-    "settings.providers": "当前模型来源"
+    "settings.providers": "当前模型来源",
+    "roles.title": "角色",
+    "roles.subtitle": "当前可派遣的角色",
+    "roles.clone": "复制角色",
+    "roles.sync": "回流经验",
+    "equipment.title": "装备库",
+    "equipment.subtitle": "当前可用的配置与导入入口",
+    "equipment.current": "当前配置",
+    "equipment.preview": "导入预览",
+    "equipment.previewAction": "解析预览",
+    "equipment.placeholder": "粘贴 skill 文本或 MCP JSON...",
+    "equipment.pluginFolder": "配置目录",
+    "runtimes.directory": "接入目录",
+    "assets.count": "{visible} / {total}",
+    "settings.enabled": "启用",
+    "settings.disabled": "未启用",
+    "onboarding.recording": "● 录制态",
+    "onboarding.roleProduct": "产品经理",
+    "onboarding.roleEngineer": "程序员",
+    "queue.collaborator": "协作者",
+    "role.lineage": "谱系 {lineage}",
+    "role.cloneTag": "分身"
   },
   "en-US": {
     "app.name": "AgentAction",
@@ -181,6 +223,13 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "language.subtitle": "Pick your language first. Phase one supports Chinese and English only.",
     "language.zh": "中文",
     "language.en": "English",
+    "common.back": "Back",
+    "common.items": "{count} items",
+    "common.none": "—",
+    "status.collecting": "Collecting",
+    "status.running": "In Progress",
+    "status.review": "In Review",
+    "status.done": "Done",
 
     "onboarding.step": "Onboarding {current}/{total}",
     "onboarding.skip": "Skip",
@@ -223,6 +272,15 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "home.latestTask": "Latest Task",
     "home.noTask": "No task yet",
     "home.noTaskDesc": "New tasks will appear here.",
+    "home.roleProduct": "Product Manager",
+    "home.roleEngineer": "Programmer",
+    "home.stepAssigned": "Task assigned",
+    "home.stepMaterials": "Materials ready",
+    "home.stepBattle": "Paired battle",
+    "home.stepDeliver": "Ready to deliver",
+    "home.materialCount": "{count} items recorded",
+    "home.progressing": "Now moving",
+    "home.waitingResult": "Waiting for result",
     "home.roles": "Roles",
     "home.rolesSubtitle": "Current roles",
     "home.templates": "Task Templates",
@@ -246,9 +304,12 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "task.share": "Share",
     "task.requestReview": "Review",
     "task.reject": "Send Back",
+    "task.rejectMessage": "The current result is not ready for delivery yet. Keep working.",
     "task.finish": "Finish",
     "task.status": "Progress",
     "task.events": "Messages",
+    "task.systemLabel": "System",
+    "task.toolLabel": "Tool",
     "task.session": "Current Conversation",
     "task.sessionReady": "Connected",
     "task.sessionMissing": "Not Connected",
@@ -272,6 +333,8 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "task.contractEmpty": "No delivery is ready yet.",
     "task.needsReview": "Needs Review",
     "task.directFinish": "Can Close Directly",
+    "task.goal": "Delivery Goal",
+    "task.goalEmpty": "Nothing collected yet",
     "task.assets": "Task Assets",
     "task.assetsSubtitle": "Things collected from this task",
     "task.shares": "Share Records",
@@ -311,7 +374,28 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "settings.onboarding": "Onboarding",
     "settings.onboardingDesc": "Open the onboarding flow again.",
     "settings.onboardingReset": "Restart Onboarding",
-    "settings.providers": "Current Model Sources"
+    "settings.providers": "Current Model Sources",
+    "roles.title": "Roles",
+    "roles.subtitle": "Roles available for dispatch",
+    "roles.clone": "Clone Role",
+    "roles.sync": "Sync Back",
+    "equipment.title": "Loadout",
+    "equipment.subtitle": "Available setup and import entry points",
+    "equipment.current": "Current Setup",
+    "equipment.preview": "Import Preview",
+    "equipment.previewAction": "Preview",
+    "equipment.placeholder": "Paste skill text or MCP JSON...",
+    "equipment.pluginFolder": "Source Files",
+    "runtimes.directory": "Source Directory",
+    "assets.count": "{visible} / {total}",
+    "settings.enabled": "Enabled",
+    "settings.disabled": "Disabled",
+    "onboarding.recording": "● Recording",
+    "onboarding.roleProduct": "Product Manager",
+    "onboarding.roleEngineer": "Programmer",
+    "queue.collaborator": "Collaborator",
+    "role.lineage": "Lineage {lineage}",
+    "role.cloneTag": "Clone"
   }
 };
 
@@ -421,6 +505,30 @@ const runtimeCopy: Record<string, Partial<Record<AppLocale, { name: string; desc
   }
 };
 
+const providerCopy: Record<string, Partial<Record<AppLocale, { name: string; role: string; note: string }>>> = {
+  provider_remote_primary: {
+    "en-US": {
+      name: "Primary Remote Model",
+      role: "Background worker",
+      note: "Used first for repetitive processing, tagging, cleanup, and memory suggestions."
+    }
+  },
+  provider_ollama_local: {
+    "en-US": {
+      name: "Local Ollama Provider",
+      role: "Configurable backup",
+      note: "Available as a local inference fallback when configured."
+    }
+  },
+  provider_ktransformers_local: {
+    "en-US": {
+      name: "Local ktransformers Provider",
+      role: "High-performance backup",
+      note: "Reserved for stronger local inference and hardware-specific optimization."
+    }
+  }
+};
+
 function interpolate(value: string, vars?: Record<string, string | number>): string {
   if (!vars) {
     return value;
@@ -470,6 +578,15 @@ export function useI18n() {
       fallback) as NonNullable<(typeof runtimeCopy)[string]["en-US"]>[T];
   }
 
+  function providerField<T extends keyof NonNullable<(typeof providerCopy)[string]["en-US"]>>(
+    providerId: string,
+    field: T,
+    fallback: NonNullable<(typeof providerCopy)[string]["en-US"]>[T]
+  ): NonNullable<(typeof providerCopy)[string]["en-US"]>[T] {
+    return (providerCopy[providerId]?.[locale.value]?.[field] ??
+      fallback) as NonNullable<(typeof providerCopy)[string]["en-US"]>[T];
+  }
+
   return {
     locale,
     t,
@@ -477,6 +594,7 @@ export function useI18n() {
     roleNickname,
     rolePersona,
     templateField,
-    runtimeField
+    runtimeField,
+    providerField
   };
 }

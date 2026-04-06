@@ -38,6 +38,8 @@ import {
 import { previewImport } from "@agentaction/plugin-core";
 import { scanPluginDirectory } from "@agentaction/plugin-core";
 import { LocalDatabase } from "./db";
+import type { AppLocale } from "./locale";
+import { daemonText } from "./locale";
 import { getRuntimeTemplate } from "./runtimeTemplates";
 import { buildCollectingReply, buildReviewSummary, buildRunningReply } from "./simulate";
 
@@ -149,9 +151,10 @@ export class AppStore {
     return task;
   }
 
-  createTask(templateId: string, roleSelections?: RoleSelection[]): Task {
+  createTask(templateId: string, roleSelections?: RoleSelection[], locale: AppLocale = "zh-CN"): Task {
     const template = this.db.get<TaskTemplatePlugin>("templates", templateId);
     const roles = this.db.list<Role>("roles");
+    const text = daemonText(locale);
 
     if (!template) {
       throw new Error("Template not found");
@@ -163,8 +166,8 @@ export class AppStore {
     if (collectPrompt) {
       addAssistantEvent(
         task,
-        roles.find((role) => role.id === task.roleSelections[0]?.roleId)?.displayName ?? "角色",
-        `我先收资料。请先给我：${collectPrompt}。`
+        roles.find((role) => role.id === task.roleSelections[0]?.roleId)?.displayName ?? text.roleFallback,
+        text.collectFirst(collectPrompt)
       );
     }
 
@@ -172,16 +175,17 @@ export class AppStore {
     return task;
   }
 
-  async sendMainMessage(taskId: string, content: string, authorLabel = "你"): Promise<Task> {
+  async sendMainMessage(taskId: string, content: string, authorLabel = "你", locale: AppLocale = "zh-CN"): Promise<Task> {
     const task = this.getTask(taskId);
     const template = this.db.get<TaskTemplatePlugin>("templates", task.templateId ?? "");
     const roles = this.db.list<Role>("roles");
     const settings = this.getSettings();
     const trimmed = content.trim();
+    const text = daemonText(locale);
 
     if (trimmed.startsWith("/btw ")) {
       createExplicitBranch(task, trimmed);
-      addAssistantEvent(task, "系统", "已根据显式 /btw 指令打开旁枝。");
+      addAssistantEvent(task, "System", text.branchOpened);
       this.saveTask(task, "conversation.branch.opened", { taskId, prompt: trimmed });
       return task;
     }
@@ -197,26 +201,26 @@ export class AppStore {
 
       addAssistantEvent(
         task,
-        roles.find((role) => role.id === task.roleSelections[0]?.roleId)?.displayName ?? "角色",
-        template ? buildCollectingReply(task, template) : "资料已收到。"
+        roles.find((role) => role.id === task.roleSelections[0]?.roleId)?.displayName ?? text.roleFallback,
+        template ? buildCollectingReply(task, template, locale) : text.materialsReceived
       );
 
       if (task.status === "running") {
-        const runtimeReply = await this.tryRunDefaultRuntime(task, template ?? undefined, roles, settings);
+        const runtimeReply = await this.tryRunDefaultRuntime(task, template ?? undefined, roles, settings, locale);
         addAssistantEvent(
           task,
-          runtimeReply?.authorLabel ?? "系统",
-          runtimeReply?.reply ?? buildRunningReply(task, roles)
+          runtimeReply?.authorLabel ?? "System",
+          runtimeReply?.reply ?? buildRunningReply(task, roles, locale)
         );
       }
     } else {
-      const runtimeReply = await this.tryRunDefaultRuntime(task, template ?? undefined, roles, settings);
+      const runtimeReply = await this.tryRunDefaultRuntime(task, template ?? undefined, roles, settings, locale);
       addAssistantEvent(
         task,
         runtimeReply?.authorLabel ??
           roles.find((role) => role.id === task.roleSelections[0]?.roleId)?.displayName ??
-          "角色",
-        runtimeReply?.reply ?? "已收到这条补充，我会继续沿当前任务上下文处理。"
+          text.roleFallback,
+        runtimeReply?.reply ?? text.keepGoing
       );
     }
 
@@ -228,7 +232,8 @@ export class AppStore {
     task: Task,
     template: TaskTemplatePlugin | undefined,
     roles: Role[],
-    settings: AppSettings
+    settings: AppSettings,
+    locale: AppLocale
   ): Promise<{ reply: string; authorLabel: string } | undefined> {
     if (process.env.AGENTACTION_DISABLE_DEFAULT_RUNTIME === "1") {
       return undefined;
@@ -238,6 +243,7 @@ export class AppStore {
       return undefined;
     }
 
+    const text = daemonText(locale);
     let runtime = this.db.get<RuntimePlugin>("runtimes", settings.defaultRuntimeId);
     if (!runtime) {
       return undefined;
@@ -270,11 +276,12 @@ export class AppStore {
         task,
         template,
         roles,
-        runtime,
-        workspaceRoot: this.workspaceRoot,
-        stateRoot: this.stateRoot,
-        sandbox: settings.defaultRuntimeSandbox
-      });
+          runtime,
+          workspaceRoot: this.workspaceRoot,
+          stateRoot: this.stateRoot,
+          sandbox: settings.defaultRuntimeSandbox,
+          locale
+        });
 
       if (explicitFinishRequest && result.status !== "finish") {
         result = await runtimeTemplate.runTask({
@@ -285,8 +292,8 @@ export class AppStore {
           workspaceRoot: this.workspaceRoot,
           stateRoot: this.stateRoot,
           sandbox: settings.defaultRuntimeSandbox,
-          contractReminder:
-            "你上一轮没有交出平台 finish 合同。现在必须把 status 设为 finish，并完整填写 finish.summary、finish.resultTitle、finish.needsReview。"
+          contractReminder: text.finishReminder,
+          locale
         });
       }
 
@@ -311,24 +318,24 @@ export class AppStore {
             event.output ? `${event.summary}\n${event.output}` : event.summary
           );
         } else if (event.kind === "finish") {
-          addAssistantEvent(task, "系统", event.summary);
+          addAssistantEvent(task, "System", event.summary);
         }
       }
 
       if (result.compactDetected) {
-        addAssistantEvent(task, "系统", "Codex 会话已触发 compact 相关事件。");
+        addAssistantEvent(task, "System", text.compactDetected);
       }
 
       if (result.status === "ready_for_review") {
         task.status = "review";
-        addAssistantEvent(task, "系统", "Codex 已请求进入待验收状态。");
+        addAssistantEvent(task, "System", text.reviewRequested);
       }
 
       if (result.status === "finish" && result.finishContract) {
         addAssistantEvent(
           task,
-          "系统",
-          `Codex 已提交平台 finish 合同：${result.finishContract.resultTitle} · ${result.finishContract.summary}`
+          "System",
+          text.finishSubmitted(result.finishContract.resultTitle, result.finishContract.summary)
         );
 
         if (result.finishContract.needsReview || task.reviewerRoleId) {
@@ -344,8 +351,8 @@ export class AppStore {
       };
     } catch (error) {
       return {
-        reply: `Codex 默认智能体调用失败：${(error as Error).message}`,
-        authorLabel: "系统"
+        reply: text.runtimeFailed((error as Error).message),
+        authorLabel: "System"
       };
     }
   }
@@ -394,9 +401,9 @@ export class AppStore {
     return task;
   }
 
-  finishTask(taskId: string): Task {
+  finishTask(taskId: string, locale: AppLocale = "zh-CN"): Task {
     const task = this.getTask(taskId);
-    approveTask(task, buildReviewSummary(task));
+    approveTask(task, buildReviewSummary(task, locale));
     this.saveTask(task, "finish.confirmed", { taskId, resultCard: task.resultCard });
     return task;
   }
@@ -422,19 +429,16 @@ export class AppStore {
     return task;
   }
 
-  extractTaskAsset(taskId: string, kind: AssetRecord["kind"], roleId?: string): Task {
+  extractTaskAsset(taskId: string, kind: AssetRecord["kind"], roleId?: string, locale: AppLocale = "zh-CN"): Task {
     const task = this.getTask(taskId);
-    const titleMap = {
-      artifact: "现场提炼产物",
-      memory: "现场提炼记忆",
-      skill: "现场提炼技能"
-    } as const;
+    const text = daemonText(locale);
+    const titleMap = text.assetTitles;
 
     extractAsset(
       task,
       kind,
       titleMap[kind],
-      task.resultCard?.summary ?? "从任务现场提炼出的资产。",
+      task.resultCard?.summary ?? text.assetSummary,
       roleId
     );
 
@@ -501,11 +505,11 @@ export class AppStore {
     const clone: Role = {
       ...role,
       id: createId("role"),
-      displayName: `${role.displayName}·分身${cloneIndex}`,
+      displayName: `${role.displayName}${daemonText("zh-CN").cloneSuffix(cloneIndex)}`,
       nickname: `${role.nickname}${cloneIndex}`,
       cloneSourceRoleId: role.id,
       isClone: true,
-      statusLabel: "待派遣"
+      statusLabel: daemonText("zh-CN").pendingStatus
     };
 
     this.db.upsert("roles", clone, nowIso());
@@ -528,7 +532,7 @@ export class AppStore {
     source.projectExperienceSkillIds = Array.from(
       new Set([...source.projectExperienceSkillIds, ...clone.projectExperienceSkillIds])
     );
-    source.notes = `${source.notes ?? ""}\n已从 ${clone.displayName} 手动回流经验。`.trim();
+    source.notes = `${source.notes ?? ""}\n${daemonText("zh-CN").syncNote(clone.displayName)}`.trim();
 
     this.db.upsert("roles", source, nowIso());
     return { clone, source };

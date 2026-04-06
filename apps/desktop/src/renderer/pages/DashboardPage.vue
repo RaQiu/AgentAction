@@ -13,21 +13,21 @@
       <div class="launch-hero__stage">
         <div class="launch-stage__meta">
           <span class="launch-stage__pill">{{ defaultRuntimeName }}</span>
-          <span class="launch-stage__pill">{{ latestTask ? statusLabelMap[latestTask.status] : t("home.noTask") }}</span>
+          <span class="launch-stage__pill">{{ latestTask ? statusLabel(latestTask.status) : t("home.noTask") }}</span>
         </div>
 
         <div class="launch-stage__roles">
           <div class="launch-stage__role">
             <span class="launch-stage__avatar">🐎</span>
             <div>
-              <strong>产品经理</strong>
+              <strong>{{ t("home.roleProduct") }}</strong>
               <span>{{ t("task.requestReview") }}</span>
             </div>
           </div>
           <div class="launch-stage__role">
             <span class="launch-stage__avatar">🐮</span>
             <div>
-              <strong>程序员</strong>
+              <strong>{{ t("home.roleEngineer") }}</strong>
               <span>{{ t("home.running") }}</span>
             </div>
           </div>
@@ -37,29 +37,29 @@
           <li class="launch-stage__step launch-stage__step--done">
             <span class="launch-stage__dot"></span>
             <div>
-              <strong>接到任务</strong>
+              <strong>{{ t("home.stepAssigned") }}</strong>
               <p>{{ latestTaskTitle }}</p>
             </div>
           </li>
           <li class="launch-stage__step launch-stage__step--done">
             <span class="launch-stage__dot"></span>
             <div>
-              <strong>补齐资料</strong>
-              <p>{{ latestTask?.collectedMaterials?.length || 0 }} 项已记录</p>
+              <strong>{{ t("home.stepMaterials") }}</strong>
+              <p>{{ t("home.materialCount", { count: latestTask?.collectedMaterials?.length || 0 }) }}</p>
             </div>
           </li>
           <li class="launch-stage__step launch-stage__step--active">
             <span class="launch-stage__dot"></span>
             <div>
-              <strong>结对 battle</strong>
-              <p>{{ latestTask?.runtimeState?.pendingFinish?.summary || "当前正在推进" }}</p>
+              <strong>{{ t("home.stepBattle") }}</strong>
+              <p>{{ latestTask?.runtimeState?.pendingFinish?.summary || t("home.progressing") }}</p>
             </div>
           </li>
           <li class="launch-stage__step">
             <span class="launch-stage__dot"></span>
             <div>
-              <strong>准备交付</strong>
-              <p>{{ latestTask?.resultCard?.title || "等待结果" }}</p>
+              <strong>{{ t("home.stepDeliver") }}</strong>
+              <p>{{ latestTask?.resultCard?.title || t("home.waitingResult") }}</p>
             </div>
           </li>
         </ol>
@@ -78,12 +78,9 @@ import { useWorkbenchStore } from "@/stores/workbench";
 const store = useWorkbenchStore();
 const { t, templateField, runtimeField } = useI18n();
 
-const statusLabelMap: Record<TaskStatus, string> = {
-  collecting: "收资料",
-  running: "执行中",
-  review: "待验收",
-  done: "已完成"
-};
+function statusLabel(status: TaskStatus) {
+  return t(`status.${status}`);
+}
 
 onMounted(() => {
   store.ensureInitialized();

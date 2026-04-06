@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
 import type {
+  AppLocale,
   Role,
   RuntimeFinishContract,
   RuntimePlugin,
@@ -20,6 +21,7 @@ interface CodexExecutionConfig {
   stateRoot: string;
   sandbox: "read-only" | "workspace-write";
   contractReminder?: string;
+  locale: AppLocale;
 }
 
 interface CodexStructuredOutput {
@@ -46,7 +48,8 @@ function buildPrompt(
   task: Task,
   template: TaskTemplatePlugin | undefined,
   roles: Role[],
-  contractReminder?: string
+  contractReminder?: string,
+  locale: AppLocale = "zh-CN"
 ): string {
   const roleNames = task.roleSelections
     .map((selection) => roles.find((role) => role.id === selection.roleId)?.displayName)
@@ -78,7 +81,9 @@ function buildPrompt(
     "当 status=finish 时，finish 不能为 null，必须给出 summary/resultTitle/needsReview。",
     "当 status 不是 finish 时，finish 必须为 null。",
     "如果你只是本轮原生完成但还没给出平台 finish 合同，不要偷懒，继续给出我们要的 finish 字段。",
-    "reply 依然用中文，保持直接、具体、能继续推进任务。",
+    locale === "en-US"
+      ? "Reply in concise English and keep the task moving."
+      : "reply 依然用中文，保持直接、具体、能继续推进任务。",
     contractReminder ?? ""
   ]
     .filter(Boolean)
@@ -95,7 +100,7 @@ function safeJsonParse(line: string): Record<string, unknown> | null {
 
 export async function runCodexTaskReply(config: CodexExecutionConfig): Promise<RuntimeTemplateTaskResult> {
   const workdirCandidate = existingPathCandidate(config.task.collectedMaterials) ?? config.workspaceRoot;
-  const prompt = buildPrompt(config.task, config.template, config.roles, config.contractReminder);
+  const prompt = buildPrompt(config.task, config.template, config.roles, config.contractReminder, config.locale);
   const schemaPath = path.join(config.workspaceRoot, "scripts", "codex-task-schema.json");
 
   const args = config.task.runtimeState?.sessionId

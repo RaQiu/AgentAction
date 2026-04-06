@@ -7,9 +7,11 @@ import type {
   Task,
   TaskTemplatePlugin
 } from "@agentaction/shared";
+import { useI18n } from "@/i18n";
 import { api } from "@/api/client";
 
 export const useWorkbenchStore = defineStore("workbench", () => {
+  const { t } = useI18n();
   const bootstrap = ref<AppBootstrap | null>(null);
   const currentTask = ref<Task | null>(null);
   const loading = ref(false);
@@ -134,7 +136,7 @@ export const useWorkbenchStore = defineStore("workbench", () => {
       return;
     }
 
-    const result = await api.queueMessage(currentTask.value.id, content, "协作者");
+    const result = await api.queueMessage(currentTask.value.id, content, t("queue.collaborator"));
     upsertTask(result.task);
   }
 

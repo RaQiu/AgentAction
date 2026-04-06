@@ -2,15 +2,15 @@
   <section class="page">
     <header class="page__hero page__hero--compact">
       <div>
-        <p class="eyebrow">装备库</p>
-        <h1>当前可用的配置与导入入口</h1>
+        <p class="eyebrow">{{ t("equipment.title") }}</p>
+        <h1>{{ t("equipment.subtitle") }}</h1>
       </div>
     </header>
 
     <section class="utility-layout">
       <article class="flat-panel">
         <div class="flat-panel__header">
-          <p class="eyebrow">当前配置</p>
+          <p class="eyebrow">{{ t("equipment.current") }}</p>
         </div>
         <ul class="flat-list">
           <li v-for="item in equipment" :key="item.id">
@@ -22,11 +22,11 @@
 
       <article class="flat-panel flat-panel--narrow">
         <div class="flat-panel__header">
-          <p class="eyebrow">导入预览</p>
+          <p class="eyebrow">{{ t("equipment.preview") }}</p>
         </div>
-        <textarea v-model="importText" class="import-area" placeholder="粘贴 skill 文本或 MCP JSON..." />
+        <textarea v-model="importText" class="import-area" :placeholder="t('equipment.placeholder')" />
         <div class="composer__actions">
-          <button class="button button--primary" @click="preview">解析预览</button>
+          <button class="button button--primary" @click="preview">{{ t("equipment.previewAction") }}</button>
         </div>
         <pre v-if="previewResult" class="preview-box">{{ JSON.stringify(previewResult, null, 2) }}</pre>
         <ul class="flat-list flat-list--compact">
@@ -42,10 +42,12 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import { useI18n } from "@/i18n";
 import { api } from "@/api/client";
 import { useWorkbenchStore } from "@/stores/workbench";
 
 const store = useWorkbenchStore();
+const { t } = useI18n();
 const importText = ref(`{
   "args": [
     "-y",

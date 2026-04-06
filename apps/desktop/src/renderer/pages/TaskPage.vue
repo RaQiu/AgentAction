@@ -5,7 +5,7 @@
         <p class="eyebrow">{{ t("shell.tasks") }}</p>
         <h1>{{ task.templateId ? templateField(task.templateId, "title", task.title) : task.title }}</h1>
         <p class="page__lead">
-          {{ statusLabelMap[task.status] }} · {{ t("task.runtime") }} {{ currentRuntimeName }} · {{ t("task.finishDiscipline") }} {{ task.finishRequired ? t("task.enabled") : t("task.disabled") }}
+          {{ statusLabel(task.status) }} · {{ t("task.runtime") }} {{ currentRuntimeName }} · {{ t("task.finishDiscipline") }} {{ task.finishRequired ? t("task.enabled") : t("task.disabled") }}
         </p>
       </div>
       <div class="hero-actions">
@@ -40,10 +40,10 @@
       </article>
 
       <article class="task-stage task-stage--light">
-        <p class="eyebrow">收束目标</p>
+        <p class="eyebrow">{{ t("task.goal") }}</p>
         <div class="task-stage__summary">
-          <strong>主结果卡</strong>
-          <span>{{ task.resultCard?.title || "尚未收束" }}</span>
+          <strong>{{ t("result.card") }}</strong>
+          <span>{{ task.resultCard?.title || t("task.goalEmpty") }}</span>
         </div>
       </article>
     </section>
@@ -55,7 +55,7 @@
             <p class="eyebrow">{{ t("task.workspace") }}</p>
             <h3>{{ t("task.workspaceSubtitle") }}</h3>
           </div>
-          <span class="tag">{{ task.mainConversation.messages.length }} 条</span>
+          <span class="tag">{{ t("common.items", { count: task.mainConversation.messages.length }) }}</span>
         </div>
 
         <div class="timeline">
@@ -66,7 +66,7 @@
             :class="messageTone(message.authorLabel, message.role)"
           >
             <div class="timeline__meta">
-              <strong>{{ message.authorLabel }}</strong>
+              <strong>{{ messageAuthorLabel(message.authorLabel) }}</strong>
               <span>{{ formatDate(message.createdAt) }}</span>
             </div>
             <p>{{ message.content }}</p>
@@ -92,7 +92,7 @@
               <p class="eyebrow">{{ t("task.sideThreads") }}</p>
               <h3>{{ t("task.sideThreadsSubtitle") }}</h3>
             </div>
-            <span class="tag">{{ task.branches.length }} 条</span>
+            <span class="tag">{{ t("common.items", { count: task.branches.length }) }}</span>
           </div>
           <div v-if="task.branches.length" class="branch-list">
             <article v-for="branchItem in task.branches" :key="branchItem.id" class="branch-item">
@@ -109,7 +109,7 @@
               <p class="eyebrow">{{ t("task.contractTitle") }}</p>
               <h3>{{ t("task.contractSubtitle") }}</h3>
             </div>
-            <span class="tag">{{ task.runtimeState?.lastStatus || "未提交" }}</span>
+            <span class="tag">{{ task.runtimeState?.lastStatus || t("task.contractPending") }}</span>
           </div>
           <div v-if="task.runtimeState?.pendingFinish" class="contract-sheet">
             <strong>{{ task.runtimeState.pendingFinish.resultTitle }}</strong>
@@ -166,15 +166,12 @@ import { useWorkbenchStore } from "@/stores/workbench";
 
 const route = useRoute();
 const store = useWorkbenchStore();
-const { t, templateField, runtimeField } = useI18n();
+const { locale, t, templateField, runtimeField, roleDisplayName } = useI18n();
 const messageText = ref("");
 
-const statusLabelMap: Record<TaskStatus, string> = {
-  collecting: "收资料",
-  running: "执行中",
-  review: "待验收",
-  done: "已完成"
-};
+function statusLabel(status: TaskStatus) {
+  return t(`status.${status}`);
+}
 
 onMounted(async () => {
   await store.loadTask(String(route.params.taskId));
@@ -188,7 +185,7 @@ const currentRuntimeName = computed(() => {
 });
 
 function formatDate(value: string): string {
-  return new Date(value).toLocaleString("zh-CN", {
+  return new Date(value).toLocaleString(locale.value, {
     hour: "2-digit",
     minute: "2-digit",
     month: "2-digit",
@@ -210,6 +207,22 @@ function messageTone(authorLabel: string, role: ConversationMessage["role"]) {
     return "timeline__item--user";
   }
   return "";
+}
+
+function messageAuthorLabel(authorLabel: string): string {
+  if (authorLabel === "系统" || authorLabel === "System") {
+    return t("task.systemLabel");
+  }
+  if (authorLabel.startsWith("Codex·工具")) {
+    return `Codex · ${t("task.toolLabel")}`;
+  }
+  if (authorLabel === "🐎 产品经理") {
+    return roleDisplayName("role_product_xiaoce", authorLabel);
+  }
+  if (authorLabel === "🐮 程序员") {
+    return roleDisplayName("role_engineer_ache", authorLabel);
+  }
+  return authorLabel;
 }
 
 async function send() {
@@ -252,7 +265,7 @@ async function requestReview() {
 }
 
 async function rejectReview() {
-  await store.rejectReview("主审认为结果还不够可交付，请继续完善。");
+  await store.rejectReview(t("task.rejectMessage"));
 }
 
 async function finish() {

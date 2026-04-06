@@ -13,15 +13,15 @@
     </div>
 
     <div class="agent-card__meta">
-      <span class="tag">{{ role.currentEquipmentIds.length }} items</span>
-      <span class="tag">谱系 {{ role.cloneLineageId }}</span>
-      <span v-if="role.isClone" class="tag tag--alert">分身</span>
+      <span class="tag">{{ t("common.items", { count: role.currentEquipmentIds.length }) }}</span>
+      <span class="tag">{{ t("role.lineage", { lineage: role.cloneLineageId }) }}</span>
+      <span v-if="role.isClone" class="tag tag--alert">{{ t("role.cloneTag") }}</span>
     </div>
 
     <div v-if="showActions" class="composer__actions">
-      <button class="button button--ghost" @click="$emit('clone', role.id)">复制角色</button>
+      <button class="button button--ghost" @click="$emit('clone', role.id)">{{ t("roles.clone") }}</button>
       <button v-if="role.isClone" class="button button--ghost" @click="$emit('sync-back', role.id)">
-        回流经验
+        {{ t("roles.sync") }}
       </button>
     </div>
   </article>
@@ -41,5 +41,5 @@ defineEmits<{
   (event: "sync-back", roleId: string): void;
 }>();
 
-const { roleDisplayName, roleNickname, rolePersona } = useI18n();
+const { t, roleDisplayName, roleNickname, rolePersona } = useI18n();
 </script>

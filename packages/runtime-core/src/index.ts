@@ -1,4 +1,5 @@
 import type {
+  AppLocale,
   Role,
   RuntimeFinishContract,
   RuntimePlugin,
@@ -56,6 +57,7 @@ export interface RuntimeTemplateCheckContext {
 export interface RuntimeTemplateInstallContext extends RuntimeTemplateCheckContext {}
 
 export interface RuntimeTemplateTaskContext extends RuntimeTemplateCheckContext {
+  locale: AppLocale;
   task: Task;
   template?: TaskTemplatePlugin;
   roles: Role[];

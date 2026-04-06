@@ -10,7 +10,7 @@
     <article class="flat-panel">
       <div class="flat-panel__header flat-panel__header--between">
         <p class="eyebrow">{{ t("assets.title") }}</p>
-        <span class="tag">{{ filteredAssets.length }} / {{ assets.length }}</span>
+        <span class="tag">{{ t("assets.count", { visible: filteredAssets.length, total: assets.length }) }}</span>
       </div>
       <div class="composer__actions">
         <select v-model="taskFilter" class="select">

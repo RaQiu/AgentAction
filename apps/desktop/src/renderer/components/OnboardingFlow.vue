@@ -24,7 +24,7 @@
 
           <section class="battle-demo">
             <header class="battle-demo__header">
-              <span class="battle-demo__recording">● Recording</span>
+              <span class="battle-demo__recording">{{ t("onboarding.recording") }}</span>
               <strong>{{ t("onboarding.hero.battle") }}</strong>
               <div class="battle-demo__outputs">
                 <span>{{ t("onboarding.hero.outputs") }}</span>
@@ -39,7 +39,7 @@
             <div class="battle-demo__body">
               <article class="battle-role battle-role--review">
                 <span class="battle-role__badge">PM</span>
-                <strong>Product Manager</strong>
+                <strong>{{ t("onboarding.roleProduct") }}</strong>
                 <span>{{ t("task.requestReview") }}</span>
               </article>
 
@@ -53,7 +53,7 @@
 
               <article class="battle-role battle-role--build">
                 <span class="battle-role__badge">DEV</span>
-                <strong>Programmer</strong>
+                <strong>{{ t("onboarding.roleEngineer") }}</strong>
                 <span>{{ t("task.runtime") }}</span>
               </article>
             </div>
@@ -139,7 +139,7 @@
 
         <div class="hero-actions onboarding-actions">
           <button v-if="currentStep > 0" class="button button--ghost" @click="$emit('step', currentStep - 1)">
-            Back
+            {{ t("common.back") }}
           </button>
           <button
             v-if="currentStep < steps.length - 1"

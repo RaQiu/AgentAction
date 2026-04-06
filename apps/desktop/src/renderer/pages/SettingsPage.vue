@@ -17,8 +17,8 @@
               <span>{{ t("settings.languageDesc") }}</span>
             </div>
             <div class="flat-list__actions">
-              <button class="button button--ghost" @click="shell.setLocale('zh-CN')">中文</button>
-              <button class="button button--ghost" @click="shell.setLocale('en-US')">English</button>
+              <button class="button button--ghost" @click="shell.setLocale('zh-CN')">{{ t("language.zh") }}</button>
+              <button class="button button--ghost" @click="shell.setLocale('en-US')">{{ t("language.en") }}</button>
             </div>
           </li>
           <li class="flat-list__row">
@@ -34,13 +34,13 @@
           </li>
           <li v-for="provider in providers" :key="provider.id" class="flat-list__row">
             <div>
-              <strong>{{ provider.name }}</strong>
-              <span>{{ provider.note }}</span>
+              <strong>{{ providerField(provider.id, "name", provider.name) }}</strong>
+              <span>{{ providerField(provider.id, "note", provider.note) }}</span>
             </div>
             <div class="flat-meta">
-              <span>{{ provider.role }}</span>
+              <span>{{ providerField(provider.id, "role", provider.role) }}</span>
               <span>{{ provider.proxyMode }}</span>
-              <span>{{ provider.enabled ? "启用" : "未启用" }}</span>
+              <span>{{ provider.enabled ? t("settings.enabled") : t("settings.disabled") }}</span>
             </div>
           </li>
         </ul>
@@ -57,7 +57,7 @@ import { useWorkbenchStore } from "@/stores/workbench";
 
 const store = useWorkbenchStore();
 const shell = useShellStore();
-const { t } = useI18n();
+const { t, providerField } = useI18n();
 
 onMounted(() => {
   store.ensureInitialized();
