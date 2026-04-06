@@ -7,22 +7,25 @@
       </div>
     </header>
 
-    <div class="role-stack">
-      <RoleCard
-        v-for="role in roles"
-        :key="role.id"
-        :role="role"
-        show-actions
-        @clone="cloneRole"
-        @sync-back="syncRole"
-      />
-    </div>
+    <article class="flat-panel">
+      <ul class="flat-list">
+        <li v-for="role in roles" :key="role.id" class="flat-list__row">
+          <div>
+            <strong>{{ role.displayName }}</strong>
+            <span>{{ role.persona }}</span>
+          </div>
+          <div class="flat-list__actions">
+            <button class="button button--ghost" @click="cloneRole(role.id)">复制角色</button>
+            <button v-if="role.isClone" class="button button--ghost" @click="syncRole(role.id)">回流经验</button>
+          </div>
+        </li>
+      </ul>
+    </article>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
-import RoleCard from "@/components/RoleCard.vue";
 import { useWorkbenchStore } from "@/stores/workbench";
 
 const store = useWorkbenchStore();

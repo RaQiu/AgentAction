@@ -211,6 +211,177 @@ strong {
   min-height: calc(100vh - 38px);
 }
 
+.flat-panel {
+  padding: 14px 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 251, 253, 0.95));
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+}
+
+.flat-panel--narrow {
+  max-width: 360px;
+}
+
+.flat-panel__header {
+  margin-bottom: 10px;
+}
+
+.flat-panel__header--between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.flat-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.flat-list li {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.flat-list__row {
+  flex-direction: row !important;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.flat-list__row > div:first-child {
+  min-width: 0;
+}
+
+.flat-list__row strong,
+.flat-list__head strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.flat-list__row span,
+.flat-list__head span,
+.flat-list li span,
+.flat-meta span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.flat-list__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.flat-list__row--stacked {
+  flex-direction: column !important;
+  align-items: stretch;
+}
+
+.flat-list__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.flat-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.utility-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 320px);
+  gap: 12px;
+  align-items: start;
+}
+
+.setup-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 12px;
+  align-items: start;
+}
+
+.setup-panel {
+  padding: 16px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 251, 253, 0.95));
+  box-shadow: var(--shadow-card);
+}
+
+.setup-panel--main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.setup-panel--side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.setup-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.setup-block h3 {
+  margin: 2px 0 0;
+  font-size: 0.94rem;
+  font-weight: 600;
+}
+
+.setup-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.setup-list li {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.setup-list li span {
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.setup-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .eyebrow {
   margin: 0;
   color: var(--accent-strong);
@@ -1023,6 +1194,8 @@ strong {
   .launch-hero,
   .task-grid,
   .task-stage-grid,
+  .setup-layout,
+  .utility-layout,
   .onboarding-shell,
   .battle-demo__body,
   .onboarding-points,

@@ -11,46 +11,47 @@
       </button>
     </header>
 
-    <section class="dispatch-grid">
-      <article class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">{{ t("dispatch.roles") }}</p>
-            <h3>{{ t("dispatch.rolesSubtitle") }}</h3>
-          </div>
+    <section class="setup-layout">
+      <article class="setup-panel setup-panel--main">
+        <div class="setup-block">
+          <p class="eyebrow">{{ t("dispatch.roles") }}</p>
+          <h3>{{ t("dispatch.rolesSubtitle") }}</h3>
+          <ul class="setup-list">
+            <li v-for="role in recommendedRoles" :key="role.id">
+              <strong>{{ roleDisplayName(role.id, role.displayName) }}</strong>
+              <span>{{ rolePersona(role.id, role.persona) }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="setup-block">
+          <p class="eyebrow">{{ t("dispatch.equipment") }}</p>
+          <h3>{{ t("dispatch.equipmentSubtitle") }}</h3>
+          <ul class="setup-list">
+            <li v-for="item in recommendedEquipment" :key="item.id">
+              <strong>{{ item.name }}</strong>
+              <span>{{ item.slot }} · {{ item.kind }}</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="setup-panel setup-panel--side">
+        <div class="setup-block">
+          <p class="eyebrow">{{ t("dispatch.materials") }}</p>
+          <h3>{{ t("dispatch.materialsSubtitle") }}</h3>
+          <ul class="setup-list">
+            <li v-for="item in templateField(template.id, 'requiredMaterials', template.requiredMaterials)" :key="item">
+              <strong>{{ item }}</strong>
+            </li>
+          </ul>
+        </div>
+        <div class="setup-actions">
           <span class="tag">{{ t("dispatch.recommendedOnly") }}</span>
+          <button class="button button--primary" :disabled="submitting" @click="startTask">
+            {{ submitting ? t("dispatch.starting") : t("dispatch.start") }}
+          </button>
         </div>
-        <div class="role-stack">
-          <RoleCard v-for="role in recommendedRoles" :key="role.id" :role="role" />
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">{{ t("dispatch.equipment") }}</p>
-            <h3>{{ t("dispatch.equipmentSubtitle") }}</h3>
-          </div>
-          <span class="tag">{{ recommendedEquipment.length }} 件</span>
-        </div>
-        <ul class="list">
-          <li v-for="item in recommendedEquipment" :key="item.id">
-            <strong>{{ item.name }}</strong>
-            <span>{{ item.slot }} · {{ item.kind }}</span>
-          </li>
-        </ul>
-      </article>
-
-      <article class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">{{ t("dispatch.materials") }}</p>
-            <h3>{{ t("dispatch.materialsSubtitle") }}</h3>
-          </div>
-        </div>
-        <ul class="list">
-          <li v-for="item in templateField(template.id, 'requiredMaterials', template.requiredMaterials)" :key="item">{{ item }}</li>
-        </ul>
       </article>
     </section>
   </section>
@@ -61,13 +62,12 @@ import { computed, onMounted, ref } from "vue";
 import type { EquipmentPlugin, Role, TaskTemplatePlugin } from "@agentaction/shared";
 import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "@/i18n";
-import RoleCard from "@/components/RoleCard.vue";
 import { useWorkbenchStore } from "@/stores/workbench";
 
 const route = useRoute();
 const router = useRouter();
 const store = useWorkbenchStore();
-const { t, templateField } = useI18n();
+const { t, templateField, roleDisplayName, rolePersona } = useI18n();
 const submitting = ref(false);
 
 onMounted(() => {

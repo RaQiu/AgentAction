@@ -4,55 +4,45 @@
       <div>
         <p class="eyebrow">{{ t("nav.runtimes") }}</p>
         <h1>{{ t("runtimes.title") }}</h1>
-        <p class="page__lead">{{ t("runtimes.subtitle") }}</p>
       </div>
     </header>
 
-    <section class="template-grid">
-      <article v-for="runtime in runtimes" :key="runtime.id" class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">{{ runtime.pluginKind }}</p>
-            <h3>{{ runtimeField(runtime.id, "name", runtime.name) }}</h3>
-          </div>
-          <span class="tag">{{ runtime.status }}</span>
-        </div>
-        <p>{{ runtimeField(runtime.id, "description", runtime.description) }}</p>
-        <ul class="list">
-          <li><strong>目标运行时</strong><span>{{ runtime.targetRuntime }}</span></li>
-          <li><strong>来源</strong><span>{{ runtime.source }}</span></li>
-          <li v-if="runtime.checkSummary"><strong>检查摘要</strong><span>{{ runtime.checkSummary }}</span></li>
-          <li v-if="runtime.detectedCommandPath"><strong>命令路径</strong><span>{{ runtime.detectedCommandPath }}</span></li>
-          <li v-if="runtime.detectedVersion"><strong>命令输出</strong><span>{{ runtime.detectedVersion }}</span></li>
-          <li v-if="runtime.githubUrl"><strong>GitHub</strong><a :href="runtime.githubUrl" target="_blank" rel="noreferrer">{{ runtime.githubUrl }}</a></li>
-          <li v-if="runtime.pathHint"><strong>接入路径</strong><span>{{ runtime.pathHint }}</span></li>
-          <li><strong>能力</strong><span>{{ runtime.capabilities.join("、") }}</span></li>
-        </ul>
-        <div class="composer__actions">
-          <button class="button button--ghost" @click="check(runtime.id)">{{ t("runtimes.check") }}</button>
-          <button v-if="runtime.installMode === 'clone' || runtime.supportsCloneInstall" class="button button--primary" @click="installClone(runtime.id)">
-            {{ t("runtimes.clone") }}
-          </button>
-          <a v-if="runtime.githubUrl" class="button button--ghost" :href="runtime.githubUrl" target="_blank" rel="noreferrer">
-            {{ t("runtimes.github") }}
-          </a>
-        </div>
-        <ul v-if="runtime.checkDetails?.length" class="list">
-          <li v-for="detail in runtime.checkDetails" :key="detail">
-            <span>{{ detail }}</span>
+    <section class="utility-layout">
+      <article class="flat-panel">
+        <ul class="flat-list">
+          <li v-for="runtime in runtimes" :key="runtime.id" class="flat-list__row flat-list__row--stacked">
+            <div class="flat-list__head">
+              <div>
+                <strong>{{ runtimeField(runtime.id, "name", runtime.name) }}</strong>
+                <span>{{ runtimeField(runtime.id, "description", runtime.description) }}</span>
+              </div>
+              <span class="tag">{{ runtime.status }}</span>
+            </div>
+            <div class="flat-meta">
+              <span>{{ runtime.targetRuntime }}</span>
+              <span>{{ runtime.source }}</span>
+              <span v-if="runtime.detectedVersion">{{ runtime.detectedVersion }}</span>
+            </div>
+            <div class="flat-list__actions">
+              <button class="button button--ghost" @click="check(runtime.id)">{{ t("runtimes.check") }}</button>
+              <button v-if="runtime.installMode === 'clone' || runtime.supportsCloneInstall" class="button button--primary" @click="installClone(runtime.id)">
+                {{ t("runtimes.clone") }}
+              </button>
+              <a v-if="runtime.githubUrl" class="button button--ghost" :href="runtime.githubUrl" target="_blank" rel="noreferrer">
+                {{ t("runtimes.github") }}
+              </a>
+            </div>
           </li>
         </ul>
-        <p v-if="runtime.installLabel" class="muted">{{ runtimeField(runtime.id, "installLabel", runtime.installLabel) }}</p>
       </article>
 
-      <article class="card">
-        <div class="section-heading">
+      <article class="flat-panel flat-panel--narrow">
+        <div class="flat-panel__header">
           <div>
-            <p class="eyebrow">运行时插件目录</p>
-            <h3>clone / hack 不进装备栏，只在平台接入层出现</h3>
+            <p class="eyebrow">接入目录</p>
           </div>
         </div>
-        <ul class="list">
+        <ul class="flat-list flat-list--compact">
           <li v-for="entry in pluginInventory.runtimeFiles" :key="entry.relativePath">
             <strong>{{ entry.name }}</strong>
             <span>{{ entry.family }} · {{ entry.containerType }}</span>

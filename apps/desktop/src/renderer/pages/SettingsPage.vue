@@ -8,62 +8,41 @@
       </div>
     </header>
 
-    <section class="template-grid">
-      <article class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">{{ t("settings.language") }}</p>
-            <h3>{{ t("settings.language") }}</h3>
-          </div>
-        </div>
-        <p class="muted">{{ t("settings.languageDesc") }}</p>
-        <div class="composer__actions">
-          <button class="button button--ghost" @click="shell.setLocale('zh-CN')">中文</button>
-          <button class="button button--ghost" @click="shell.setLocale('en-US')">English</button>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">{{ t("settings.onboarding") }}</p>
-            <h3>{{ t("settings.onboarding") }}</h3>
-          </div>
-        </div>
-        <p class="muted">{{ t("settings.onboardingDesc") }}</p>
-        <div class="composer__actions">
-          <button class="button button--primary" @click="shell.resetOnboarding()">
-            {{ t("settings.onboardingReset") }}
-          </button>
-        </div>
-      </article>
-
-      <article v-for="provider in providers" :key="provider.id" class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">{{ t("settings.providers") }}</p>
-            <h3>{{ provider.name }}</h3>
-          </div>
-          <span class="tag">{{ provider.enabled ? "启用" : "未启用" }}</span>
-        </div>
-        <p>{{ provider.note }}</p>
-        <ul class="list">
-          <li><strong>职责</strong><span>{{ provider.role }}</span></li>
-          <li><strong>代理模式</strong><span>{{ provider.proxyMode }}</span></li>
-        </ul>
-      </article>
-
-      <article class="card">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">网络策略</p>
-            <h3>本地永远直连，外部 provider 按目标分流</h3>
-          </div>
-        </div>
-        <ul class="list">
-          <li><strong>本地 daemon</strong><span>不走代理，避免被梯子拦截</span></li>
-          <li><strong>远程模型 / IM</strong><span>按 provider 单独配置是否走代理</span></li>
-          <li><strong>升级策略</strong><span>只自动升级官方部分，用户插件保守保留</span></li>
+    <section class="utility-layout">
+      <article class="flat-panel">
+        <ul class="flat-list">
+          <li class="flat-list__row">
+            <div>
+              <strong>{{ t("settings.language") }}</strong>
+              <span>{{ t("settings.languageDesc") }}</span>
+            </div>
+            <div class="flat-list__actions">
+              <button class="button button--ghost" @click="shell.setLocale('zh-CN')">中文</button>
+              <button class="button button--ghost" @click="shell.setLocale('en-US')">English</button>
+            </div>
+          </li>
+          <li class="flat-list__row">
+            <div>
+              <strong>{{ t("settings.onboarding") }}</strong>
+              <span>{{ t("settings.onboardingDesc") }}</span>
+            </div>
+            <div class="flat-list__actions">
+              <button class="button button--primary" @click="shell.resetOnboarding()">
+                {{ t("settings.onboardingReset") }}
+              </button>
+            </div>
+          </li>
+          <li v-for="provider in providers" :key="provider.id" class="flat-list__row">
+            <div>
+              <strong>{{ provider.name }}</strong>
+              <span>{{ provider.note }}</span>
+            </div>
+            <div class="flat-meta">
+              <span>{{ provider.role }}</span>
+              <span>{{ provider.proxyMode }}</span>
+              <span>{{ provider.enabled ? "启用" : "未启用" }}</span>
+            </div>
+          </li>
         </ul>
       </article>
     </section>

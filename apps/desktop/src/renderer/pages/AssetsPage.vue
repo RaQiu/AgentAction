@@ -7,13 +7,10 @@
       </div>
     </header>
 
-    <article class="card">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">{{ t("assets.title") }}</p>
-          <h3>{{ t("assets.subtitle") }}</h3>
-        </div>
-        <span class="tag">{{ filteredAssets.length }} / {{ assets.length }} 项</span>
+    <article class="flat-panel">
+      <div class="flat-panel__header flat-panel__header--between">
+        <p class="eyebrow">{{ t("assets.title") }}</p>
+        <span class="tag">{{ filteredAssets.length }} / {{ assets.length }}</span>
       </div>
       <div class="composer__actions">
         <select v-model="taskFilter" class="select">
@@ -31,7 +28,7 @@
           <option value="skill">{{ t("assets.kind.skill") }}</option>
         </select>
       </div>
-      <ul class="list">
+      <ul class="flat-list">
         <li v-for="asset in filteredAssets" :key="asset.id">
           <strong>{{ asset.title }}</strong>
           <span>{{ asset.kind }} · {{ asset.summary }}</span>
