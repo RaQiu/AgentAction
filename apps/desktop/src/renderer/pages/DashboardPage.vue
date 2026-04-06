@@ -16,7 +16,7 @@
           <div class="ops-grid">
             <div class="ops-cell">
               <strong>{{ tasks.length }}</strong>
-              <span>任务容器</span>
+              <span>{{ t("shell.tasks") }}</span>
             </div>
             <div class="ops-cell">
               <strong>{{ runningTasks }}</strong>
@@ -28,7 +28,7 @@
             </div>
             <div class="ops-cell">
               <strong>{{ defaultRuntimeName }}</strong>
-              <span>{{ t("shell.defaultRuntime") }}</span>
+              <span>{{ t("home.defaultRuntimePanel") }}</span>
             </div>
           </div>
         </article>
