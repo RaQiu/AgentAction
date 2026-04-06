@@ -21,20 +21,23 @@
           <span class="tag">{{ t("dispatch.recommendedOnly") }}</span>
         </div>
 
-        <div class="dispatch-pair">
-          <article
-            v-for="role in recommendedRoles"
-            :key="role.id"
-            class="dispatch-role-tile"
-          >
-            <div class="dispatch-role-tile__avatar">
-              <span>{{ roleNickname(role.id, role.nickname) }}</span>
-            </div>
-            <div class="dispatch-role-tile__body">
-              <strong>{{ roleDisplayName(role.id, role.displayName) }}</strong>
-              <span>{{ dispatchRoleHint(role.id) }}</span>
-            </div>
-          </article>
+        <div class="dispatch-arena">
+          <template v-for="(role, index) in recommendedRoles" :key="role.id">
+            <article class="dispatch-slot">
+              <div class="dispatch-slot__portrait">
+                <span>{{ roleNickname(role.id, role.nickname) }}</span>
+              </div>
+              <div class="dispatch-slot__label">
+                <strong>{{ roleDisplayName(role.id, role.displayName) }}</strong>
+                <span>{{ dispatchRoleHint(role.id) }}</span>
+              </div>
+            </article>
+            <div
+              v-if="index < recommendedRoles.length - 1"
+              class="dispatch-arena__link"
+              aria-hidden="true"
+            ></div>
+          </template>
         </div>
 
         <div class="dispatch-footer-strip">
