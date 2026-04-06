@@ -112,10 +112,10 @@ const officialEquipment: EquipmentPlugin[] = [
 const officialRoles: Role[] = [
   {
     id: "role_product_xiaoce",
-    displayName: "产品·小策",
-    nickname: "小策",
+    displayName: "🐎 产品经理",
+    nickname: "🐎",
     profession: "product",
-    persona: "擅长追问目标、收口范围，并对结果可交付性负责。",
+    persona: "负责追问需求、判断交付标准、决定是否打回。",
     avatar: {
       type: "png",
       src: "role-product.png",
@@ -139,14 +139,14 @@ const officialRoles: Role[] = [
     ],
     cloneLineageId: "lineage_product_xiaoce",
     projectExperienceSkillIds: [],
-    notes: "主审型角色，适合作为 /combined 的验收方。"
+    notes: "主审角色。"
   },
   {
     id: "role_engineer_ache",
-    displayName: "程序员·阿澈",
-    nickname: "阿澈",
+    displayName: "🐮 程序员",
+    nickname: "🐮",
     profession: "engineer",
-    persona: "偏可运行与可打包交付，适合作为实现与修复角色。",
+    persona: "负责实现、调试、修复，并持续把东西做出来。",
     avatar: {
       type: "png",
       src: "role-engineer.png",
@@ -170,67 +170,7 @@ const officialRoles: Role[] = [
     ],
     cloneLineageId: "lineage_engineer_ache",
     projectExperienceSkillIds: [],
-    notes: "主执行型角色，适合开发、调试和打包。"
-  },
-  {
-    id: "role_research_wenbo",
-    displayName: "资料·闻博",
-    nickname: "闻博",
-    profession: "research",
-    persona: "擅长资料深读、课程搜集和学习计划整理。",
-    avatar: {
-      type: "png",
-      src: "role-research.png",
-      moodMap: {
-        idle: "role-research-idle.png",
-        reading: "role-research-reading.png"
-      }
-    },
-    statusLabel: "待派遣",
-    defaultEquipmentIds: [
-      "equip_prof_research",
-      "equip_browser_bili",
-      "equip_doc_reading_plan",
-      "equip_mcp_context7"
-    ],
-    currentEquipmentIds: [
-      "equip_prof_research",
-      "equip_browser_bili",
-      "equip_doc_reading_plan",
-      "equip_mcp_context7"
-    ],
-    cloneLineageId: "lineage_research_wenbo",
-    projectExperienceSkillIds: [],
-    notes: "长文阅读与资料整理专长。"
-  },
-  {
-    id: "role_executor_xingya",
-    displayName: "执行·行牙",
-    nickname: "行牙",
-    profession: "executor",
-    persona: "偏桌面流程执行，关键动作前会显式请求确认。",
-    avatar: {
-      type: "png",
-      src: "role-executor.png",
-      moodMap: {
-        idle: "role-executor-idle.png",
-        acting: "role-executor-acting.png"
-      }
-    },
-    statusLabel: "待派遣",
-    defaultEquipmentIds: [
-      "equip_prof_executor",
-      "equip_browser_bili",
-      "equip_project_delivery"
-    ],
-    currentEquipmentIds: [
-      "equip_prof_executor",
-      "equip_browser_bili",
-      "equip_project_delivery"
-    ],
-    cloneLineageId: "lineage_executor_xingya",
-    projectExperienceSkillIds: [],
-    notes: "负责把任务中的电脑操作步骤跑通。"
+    notes: "执行角色。"
   }
 ];
 
@@ -241,7 +181,7 @@ const officialTemplates: TaskTemplatePlugin[] = [
     tagline: "把论文和参考文献吃透，再给我一个可手改的带批注文档。",
     description: "适合学生和研究者，把 PDF/Word 论文和参考文献转成可手改的批注版结果。",
     instructionsSkillId: "equip_doc_word_review",
-    recommendedRoleIds: ["role_research_wenbo", "role_product_xiaoce"],
+    recommendedRoleIds: ["role_product_xiaoce", "role_engineer_ache"],
     recommendedEquipmentIds: [
       "equip_doc_word_review",
       "equip_mcp_context7",
@@ -252,8 +192,8 @@ const officialTemplates: TaskTemplatePlugin[] = [
     outcomeTitle: "带批注 Word 主结果卡",
     scenarioSteps: [
       "角色先确认论文文件和参考文献是否齐备",
-      "资料角色阅读论文与参考文献并整理问题点",
-      "产品角色收束修改建议并生成带批注 Word"
+      "🐮 先整理论文与参考资料",
+      "🐎 收束修改意见并生成带批注 Word"
     ]
   },
   {
@@ -262,7 +202,7 @@ const officialTemplates: TaskTemplatePlugin[] = [
     tagline: "找课、抓音频、转文字、做结构化笔记，一次走完。",
     description: "适合需要快速进入某个领域的普通用户，最终导出字幕和课程笔记。",
     instructionsSkillId: "equip_browser_bili",
-    recommendedRoleIds: ["role_research_wenbo", "role_executor_xingya"],
+    recommendedRoleIds: ["role_product_xiaoce", "role_engineer_ache"],
     recommendedEquipmentIds: [
       "equip_browser_bili",
       "equip_doc_reading_plan",
@@ -271,9 +211,8 @@ const officialTemplates: TaskTemplatePlugin[] = [
     requiredMaterials: ["课程主题关键词或链接", "偏好难度或时长", "笔记偏好格式"],
     outcomeTitle: "课程笔记主结果卡",
     scenarioSteps: [
-      "资料角色筛选课程并确认候选",
-      "执行角色抓取音频和字幕产物",
-      "资料角色总结成结构化笔记"
+      "🐎 先确认课程目标和筛选标准",
+      "🐮 继续抓取素材并整理成字幕和笔记"
     ]
   },
   {
@@ -282,7 +221,7 @@ const officialTemplates: TaskTemplatePlugin[] = [
     tagline: "逐本阅读、逐本总结，再生成可执行的学习路线。",
     description: "适合长期学习型任务，收束出每本书的总结和学习行动安排。",
     instructionsSkillId: "equip_doc_reading_plan",
-    recommendedRoleIds: ["role_research_wenbo"],
+    recommendedRoleIds: ["role_product_xiaoce", "role_engineer_ache"],
     recommendedEquipmentIds: [
       "equip_doc_reading_plan",
       "equip_project_delivery"
@@ -290,9 +229,8 @@ const officialTemplates: TaskTemplatePlugin[] = [
     requiredMaterials: ["电子书文件夹路径", "学习目标", "每周可投入时间"],
     outcomeTitle: "学习规划主结果卡",
     scenarioSteps: [
-      "确认文件夹路径和目标书单",
-      "逐本抽取关键观点并归档",
-      "输出每本总结和总学习规划"
+      "🐎 先确认书单和学习目标",
+      "🐮 逐本整理重点并输出总结与学习规划"
     ]
   },
   {

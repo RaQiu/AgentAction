@@ -2,8 +2,8 @@
   <section class="page">
     <header class="page__hero page__hero--compact">
       <div>
-        <p class="eyebrow">角色库</p>
-        <h1>职业模板 + 昵称，支持完整分身复制与后续回流。</h1>
+        <p class="eyebrow">角色</p>
+        <h1>当前可派遣的角色</h1>
       </div>
     </header>
 

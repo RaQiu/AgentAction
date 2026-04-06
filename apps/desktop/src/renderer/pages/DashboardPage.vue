@@ -6,8 +6,7 @@
         <h1>{{ t("home.title") }}</h1>
         <p class="page__lead">{{ t("home.subtitle") }}</p>
         <div class="hero-actions hero-actions--inline">
-          <RouterLink to="/runtimes" class="button button--primary">{{ t("home.primaryCta") }}</RouterLink>
-          <RouterLink to="/roles" class="button button--ghost">{{ t("home.secondaryCta") }}</RouterLink>
+          <RouterLink :to="firstTemplateRoute" class="button button--primary">{{ t("home.primaryCta") }}</RouterLink>
         </div>
       </div>
 
@@ -52,21 +51,7 @@
       </div>
     </header>
 
-    <section class="dashboard-grid">
-      <section class="mission-section">
-      <div class="section-heading section-heading--wide">
-        <div>
-          <p class="eyebrow">{{ t("home.roles") }}</p>
-          <h3>{{ t("home.rolesSubtitle") }}</h3>
-        </div>
-        <span class="tag tag--live">{{ defaultRuntimeReady ? t("home.runtimeReady") : t("home.runtimePending") }}</span>
-      </div>
-      <div class="roster-grid">
-        <RoleCard v-for="role in heroRoles" :key="role.id" :role="role" />
-      </div>
-      </section>
-
-      <section class="mission-section">
+    <section class="mission-section">
       <div class="section-heading section-heading--wide">
         <div>
           <p class="eyebrow">{{ t("home.templates") }}</p>
@@ -77,7 +62,6 @@
       <div class="template-grid">
         <TaskTemplateCard v-for="template in templates" :key="template.id" :template="template" />
       </div>
-      </section>
     </section>
   </section>
 </template>
@@ -87,7 +71,6 @@ import { computed, onMounted } from "vue";
 import type { TaskStatus } from "@agentaction/shared";
 import { RouterLink } from "vue-router";
 import { useI18n } from "@/i18n";
-import RoleCard from "@/components/RoleCard.vue";
 import TaskTemplateCard from "@/components/TaskTemplateCard.vue";
 import { useWorkbenchStore } from "@/stores/workbench";
 
@@ -106,13 +89,12 @@ onMounted(() => {
 });
 
 const templates = computed(() => store.templates);
-const roles = computed(() => store.roles);
 const runtimes = computed(() => store.runtimes);
 const tasks = computed(() => store.tasks);
-const heroRoles = computed(() => roles.value.slice(0, 4));
 const runningTasks = computed(() => tasks.value.filter((task) => task.status === "running").length);
 const reviewTasks = computed(() => tasks.value.filter((task) => task.status === "review").length);
 const latestTasks = computed(() => tasks.value.slice(0, 4));
+const firstTemplateRoute = computed(() => `/templates/${templates.value[0]?.id ?? "tpl_build_feature"}`);
 const defaultRuntimeName = computed(() => {
   const runtime = runtimes.value.find((item) => item.id === store.settings?.defaultRuntimeId);
   return runtime ? runtimeField(runtime.id, "name", runtime.name) : "—";

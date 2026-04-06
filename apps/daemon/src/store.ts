@@ -44,6 +44,10 @@ import { buildCollectingReply, buildReviewSummary, buildRunningReply } from "./s
 export class AppStore {
   private readonly db: LocalDatabase;
   private readonly stateRoot: string;
+  private readonly visibleRoleLineages = new Set([
+    "lineage_product_xiaoce",
+    "lineage_engineer_ache"
+  ]);
 
   constructor(private readonly workspaceRoot: string) {
     this.stateRoot =
@@ -103,11 +107,14 @@ export class AppStore {
 
   bootstrap(): AppBootstrap {
     const tasks = this.listTasks();
+    const roles = this.db
+      .list<Role>("roles")
+      .filter((role) => this.visibleRoleLineages.has(role.cloneLineageId));
     const assets = tasks.flatMap((task) => task.assets);
 
     return {
       templates: this.db.list("templates"),
-      roles: this.db.list("roles"),
+      roles,
       equipment: this.db.list("equipment"),
       runtimes: this.db.list("runtimes"),
       providers: this.db.list("providers"),

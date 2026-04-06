@@ -7,8 +7,8 @@ type UiCopy = Record<string, string>;
 const uiCopy: Record<AppLocale, UiCopy> = {
   "zh-CN": {
     "app.name": "AgentAction",
-    "app.subtitle": "任务与结果",
-    "app.summary": "把任务交下去，回来收结果。",
+    "app.subtitle": "派任务，收结果",
+    "app.summary": "让两只 AI 牛马自己 battle，直到出结果。",
     "nav.dashboard": "任务大厅",
     "nav.roles": "角色库",
     "nav.equipment": "装备库",
@@ -56,23 +56,23 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "onboarding.cta.title": "进入首页后，你可以先看 battle，再决定派什么任务。",
     "onboarding.cta.subtitle": "只要没跳过或没完成引导，下次打开仍会先进入这里。",
 
-    "home.title": "挑一个任务，开始派遣。",
-    "home.subtitle": "从真实需求开始，系统会继续推进。",
-    "home.primaryCta": "查看任务",
+    "home.title": "派遣一个任务，让两只AI牛马自己battle，直到出结果",
+    "home.subtitle": "从真实需求开始。",
+    "home.primaryCta": "开始任务",
     "home.secondaryCta": "查看角色",
-    "home.overview": "当前任务",
+    "home.overview": "当前进度",
     "home.running": "执行中",
     "home.review": "待验收",
-    "home.defaultRuntimePanel": "最近任务",
+    "home.defaultRuntimePanel": "正在推进",
     "home.runtimeReady": "可用",
     "home.runtimePending": "待检查",
     "home.latestTask": "最近任务",
     "home.noTask": "暂无任务",
     "home.noTaskDesc": "创建任务后会显示在这里",
     "home.roles": "角色",
-    "home.rolesSubtitle": "常用角色",
+    "home.rolesSubtitle": "当前角色",
     "home.templates": "任务模板",
-    "home.templatesSubtitle": "选择一个任务开始",
+    "home.templatesSubtitle": "先选一个真实需求",
 
     "dispatch.title": "轻量编队卡",
     "dispatch.start": "一键配置并开始",
@@ -161,8 +161,8 @@ const uiCopy: Record<AppLocale, UiCopy> = {
   },
   "en-US": {
     "app.name": "AgentAction",
-    "app.subtitle": "Tasks and Results",
-    "app.summary": "Dispatch the work and come back for the result.",
+    "app.subtitle": "Dispatch and Deliver",
+    "app.summary": "Dispatch one task and let two AI workers battle until a result lands.",
     "nav.dashboard": "Dashboard",
     "nav.roles": "Roles",
     "nav.equipment": "Loadout",
@@ -210,23 +210,23 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "onboarding.cta.title": "Start by watching one battle, then dispatch your own task.",
     "onboarding.cta.subtitle": "Until you skip or finish onboarding, it opens every time.",
 
-    "home.title": "Pick a task and start dispatching.",
-    "home.subtitle": "Start from a real need and let the system keep moving.",
-    "home.primaryCta": "View Tasks",
+    "home.title": "Dispatch one task and let two AI workers battle until a result lands.",
+    "home.subtitle": "Start from a real need.",
+    "home.primaryCta": "Start Task",
     "home.secondaryCta": "View Roles",
-    "home.overview": "Current Tasks",
+    "home.overview": "Current Progress",
     "home.running": "In Progress",
     "home.review": "Pending Review",
-    "home.defaultRuntimePanel": "Latest Task",
+    "home.defaultRuntimePanel": "Now Running",
     "home.runtimeReady": "Available",
     "home.runtimePending": "Pending",
     "home.latestTask": "Latest Task",
     "home.noTask": "No task yet",
     "home.noTaskDesc": "New tasks will appear here.",
     "home.roles": "Roles",
-    "home.rolesSubtitle": "Common roles",
+    "home.rolesSubtitle": "Current roles",
     "home.templates": "Task Templates",
-    "home.templatesSubtitle": "Choose one task to begin",
+    "home.templatesSubtitle": "Pick one real-world task",
 
     "dispatch.title": "Quick Dispatch",
     "dispatch.start": "Apply and Start",
@@ -318,30 +318,16 @@ const uiCopy: Record<AppLocale, UiCopy> = {
 const roleCopy: Record<string, Partial<Record<AppLocale, { displayName: string; persona: string; nickname: string }>>> = {
   role_product_xiaoce: {
     "en-US": {
-      displayName: "Product · Xiaoce",
-      nickname: "Xiaoce",
-      persona: "Clarifies goals, narrows scope, and reviews delivery quality."
+      displayName: "🐎 Product Manager",
+      nickname: "🐎",
+      persona: "Clarifies the goal, reviews the work, and decides whether it goes back."
     }
   },
   role_engineer_ache: {
     "en-US": {
-      displayName: "Engineer · Ache",
-      nickname: "Ache",
-      persona: "Focuses on runnable delivery, debugging, and packaging."
-    }
-  },
-  role_research_wenbo: {
-    "en-US": {
-      displayName: "Research · Wenbo",
-      nickname: "Wenbo",
-      persona: "Handles deep reading, source gathering, and study planning."
-    }
-  },
-  role_executor_xingya: {
-    "en-US": {
-      displayName: "Executor · Xingya",
-      nickname: "Xingya",
-      persona: "Handles desktop execution and explicit confirmation for key actions."
+      displayName: "🐮 Programmer",
+      nickname: "🐮",
+      persona: "Builds, fixes, and keeps pushing the task toward delivery."
     }
   }
 };
