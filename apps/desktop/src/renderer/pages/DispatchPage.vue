@@ -6,52 +6,80 @@
         <h1>{{ templateField(template.id, "title", template.title) }}</h1>
         <p class="page__lead">{{ templateField(template.id, "description", template.description) }}</p>
       </div>
+      <button class="button button--primary" :disabled="submitting" @click="startTask">
+        {{ submitting ? t("dispatch.starting") : t("dispatch.start") }}
+      </button>
     </header>
 
-    <article class="dispatch-sheet">
-      <div class="dispatch-sheet__main">
-        <section class="dispatch-sheet__section">
-          <p class="eyebrow">{{ t("dispatch.roles") }}</p>
-          <ul class="dispatch-sheet__list">
-            <li v-for="role in recommendedRoles" :key="role.id">
+    <section class="dispatch-studio">
+      <article class="dispatch-studio__hero">
+        <div class="dispatch-studio__header">
+          <div>
+            <p class="eyebrow">{{ t("dispatch.previewTitle") }}</p>
+            <h3>{{ t("dispatch.previewSubtitle") }}</h3>
+          </div>
+          <span class="tag">{{ t("dispatch.recommendedOnly") }}</span>
+        </div>
+
+        <div class="dispatch-pair">
+          <article
+            v-for="role in recommendedRoles"
+            :key="role.id"
+            class="dispatch-role-tile"
+          >
+            <div class="dispatch-role-tile__avatar">
+              <span>{{ roleNickname(role.id, role.nickname) }}</span>
+            </div>
+            <div class="dispatch-role-tile__body">
               <strong>{{ roleDisplayName(role.id, role.displayName) }}</strong>
               <span>{{ rolePersona(role.id, role.persona) }}</span>
-            </li>
-          </ul>
-        </section>
+            </div>
+          </article>
+        </div>
 
-        <section class="dispatch-sheet__section">
-          <p class="eyebrow">{{ t("dispatch.equipment") }}</p>
-          <ul class="dispatch-sheet__list">
-            <li v-for="item in recommendedEquipment" :key="item.id">
-              <strong>{{ item.name }}</strong>
-              <span>{{ item.description }}</span>
-            </li>
-          </ul>
-        </section>
-      </div>
+        <div class="dispatch-output">
+          <p class="eyebrow">{{ t("dispatch.outputTitle") }}</p>
+          <strong>{{ templateField(template.id, "outcomeTitle", template.outcomeTitle) }}</strong>
+        </div>
 
-      <aside class="dispatch-sheet__side">
-        <section class="dispatch-sheet__section">
-          <p class="eyebrow">{{ t("dispatch.materials") }}</p>
-          <ul class="dispatch-sheet__list">
+        <div class="dispatch-chip-cloud">
+          <span
+            v-for="item in recommendedEquipment"
+            :key="item.id"
+            class="dispatch-chip"
+          >
+            {{ item.name }}
+          </span>
+        </div>
+      </article>
+
+      <aside class="dispatch-studio__side">
+        <section class="dispatch-side-card">
+          <div class="dispatch-side-card__header">
+            <div>
+              <p class="eyebrow">{{ t("dispatch.materials") }}</p>
+              <h3>{{ t("dispatch.materialsSubtitle") }}</h3>
+            </div>
+          </div>
+          <ul class="dispatch-side-list">
             <li
               v-for="item in templateField(template.id, 'requiredMaterials', template.requiredMaterials)"
               :key="item"
             >
-              <strong>{{ item }}</strong>
+              <span class="dispatch-side-list__dot"></span>
+              <span>{{ item }}</span>
             </li>
           </ul>
         </section>
 
-        <div class="dispatch-sheet__actions">
-          <span class="tag">{{ t("dispatch.recommendedOnly") }}</span>
-          <button class="button button--primary" :disabled="submitting" @click="startTask">
+        <section class="dispatch-side-card">
+          <p class="muted">{{ t("dispatch.followup") }}</p>
+          <button class="button button--primary dispatch-side-card__button" :disabled="submitting" @click="startTask">
             {{ submitting ? t("dispatch.starting") : t("dispatch.start") }}
           </button>
-        </div>
+        </section>
       </aside>
-    </article>
+    </section>
   </section>
 </template>
 
@@ -65,7 +93,7 @@ import { useWorkbenchStore } from "@/stores/workbench";
 const route = useRoute();
 const router = useRouter();
 const store = useWorkbenchStore();
-const { t, templateField, roleDisplayName, rolePersona } = useI18n();
+const { t, templateField, roleDisplayName, roleNickname, rolePersona } = useI18n();
 const submitting = ref(false);
 
 onMounted(() => {

@@ -100,6 +100,11 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "dispatch.materials": "任务所需资料",
     "dispatch.materialsSubtitle": "缺少的资料会继续追问",
     "dispatch.recommendedOnly": "只推荐，不自动装",
+    "dispatch.previewTitle": "这次出战",
+    "dispatch.previewSubtitle": "确认组合后再开工",
+    "dispatch.outputTitle": "预计主结果",
+    "dispatch.followup": "资料不足时，系统会继续追问。",
+    "dispatch.caseAction": "进入任务",
 
     "task.runtime": "当前助手",
     "task.finishDiscipline": "交付状态",
@@ -300,6 +305,11 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "dispatch.materials": "Required Materials",
     "dispatch.materialsSubtitle": "Missing materials will be requested next",
     "dispatch.recommendedOnly": "Suggested only",
+    "dispatch.previewTitle": "Current Lineup",
+    "dispatch.previewSubtitle": "Confirm the pair before launch",
+    "dispatch.outputTitle": "Expected Main Result",
+    "dispatch.followup": "If materials are missing, the system keeps asking next.",
+    "dispatch.caseAction": "Open Task",
 
     "task.runtime": "Current Assistant",
     "task.finishDiscipline": "Delivery Status",
