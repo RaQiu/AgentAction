@@ -235,14 +235,20 @@ export class AppStore {
 
       if (task.status === "running") {
         const runtimeReply = await this.tryRunDefaultRuntime(task, template ?? undefined, roles, settings);
-        addAssistantEvent(task, "Codex", runtimeReply ?? buildRunningReply(task, roles));
+        addAssistantEvent(
+          task,
+          runtimeReply?.authorLabel ?? "系统",
+          runtimeReply?.reply ?? buildRunningReply(task, roles)
+        );
       }
     } else {
       const runtimeReply = await this.tryRunDefaultRuntime(task, template ?? undefined, roles, settings);
       addAssistantEvent(
         task,
-        runtimeReply ? "Codex" : roles.find((role) => role.id === task.roleSelections[0]?.roleId)?.displayName ?? "角色",
-        runtimeReply ?? "已收到这条补充，我会继续沿当前任务上下文处理。"
+        runtimeReply?.authorLabel ??
+          roles.find((role) => role.id === task.roleSelections[0]?.roleId)?.displayName ??
+          "角色",
+        runtimeReply?.reply ?? "已收到这条补充，我会继续沿当前任务上下文处理。"
       );
     }
 
@@ -255,7 +261,7 @@ export class AppStore {
     template: TaskTemplatePlugin | undefined,
     roles: Role[],
     settings: AppSettings
-  ): Promise<string | undefined> {
+  ): Promise<{ reply: string; authorLabel: string } | undefined> {
     if (process.env.AGENTACTION_DISABLE_DEFAULT_RUNTIME === "1") {
       return undefined;
     }
@@ -278,7 +284,7 @@ export class AppStore {
     }
 
     try {
-      return await runCodexTaskReply({
+      const result = await runCodexTaskReply({
         task,
         template,
         roles,
@@ -286,8 +292,30 @@ export class AppStore {
         workspaceRoot: this.workspaceRoot,
         sandbox: settings.defaultRuntimeSandbox
       });
+
+      for (const event of result.events) {
+        if (event.kind === "tool-start") {
+          addAssistantEvent(task, "Codex·工具", event.summary);
+        } else if (event.kind === "tool-end") {
+          addAssistantEvent(
+            task,
+            "Codex·工具",
+            event.output ? `${event.summary}\n${event.output}` : event.summary
+          );
+        } else if (event.kind === "finish") {
+          addAssistantEvent(task, "系统", event.summary);
+        }
+      }
+
+      return {
+        reply: result.reply,
+        authorLabel: "Codex"
+      };
     } catch (error) {
-      return `Codex 默认智能体调用失败：${(error as Error).message}`;
+      return {
+        reply: `Codex 默认智能体调用失败：${(error as Error).message}`,
+        authorLabel: "系统"
+      };
     }
   }
 
