@@ -1,5 +1,5 @@
 <template>
-  <section class="card queue-panel">
+  <section class="queue-panel">
     <div class="section-heading">
       <div>
         <p class="eyebrow">插话队列</p>

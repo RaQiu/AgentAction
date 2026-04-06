@@ -1,18 +1,21 @@
 <template>
-  <article class="card role-card">
-    <div class="role-card__title">
-      <div class="avatar">{{ role.nickname.slice(0, 1) }}</div>
-      <div>
+  <article class="agent-card" :class="`agent-card--${role.profession}`">
+    <div class="agent-card__visual">
+      <div class="agent-card__portrait">
+        <span class="agent-card__callsign">{{ role.nickname.slice(0, 1) }}</span>
+        <span class="agent-card__ring"></span>
+      </div>
+      <div class="agent-card__identity">
+        <span class="agent-card__profession">{{ role.profession }}</span>
         <h3>{{ role.displayName }}</h3>
         <p>{{ role.persona }}</p>
       </div>
     </div>
 
-    <div class="role-card__meta">
-      <span class="tag">{{ role.profession }}</span>
-      <span class="tag">装备 {{ role.currentEquipmentIds.length }}</span>
+    <div class="agent-card__meta">
+      <span class="tag">{{ role.currentEquipmentIds.length }} 件装备</span>
       <span class="tag">谱系 {{ role.cloneLineageId }}</span>
-      <span v-if="role.isClone" class="tag">分身</span>
+      <span v-if="role.isClone" class="tag tag--alert">分身</span>
     </div>
 
     <div v-if="showActions" class="composer__actions">

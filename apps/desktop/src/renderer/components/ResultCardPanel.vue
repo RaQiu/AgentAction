@@ -1,5 +1,5 @@
 <template>
-  <section v-if="task.resultCard" class="card result-card">
+  <section v-if="task.resultCard" class="result-card">
     <div class="result-card__header">
       <div>
         <p class="eyebrow">主结果卡</p>

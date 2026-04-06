@@ -3,6 +3,21 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@agentaction/shared": [
+        "../../packages/shared/src/index.ts"
+      ],
+      "@agentaction/task-engine": [
+        "../../packages/task-engine/src/index.ts"
+      ],
+      "@agentaction/plugin-core": [
+        "../../packages/plugin-core/src/index.ts"
+      ],
+      "@agentaction/provider-core": [
+        "../../packages/provider-core/src/index.ts"
+      ],
+      "@agentaction/runtime-core": [
+        "../../packages/runtime-core/src/index.ts"
+      ],
       "@/*": [
         "src/renderer/*"
       ]
