@@ -46,7 +46,6 @@
 
         <div class="role-stock-card__meta">
           <span class="tag">{{ t("common.items", { count: role.currentEquipmentIds.length }) }}</span>
-          <span class="tag">{{ t("role.lineage", { lineage: role.cloneLineageId }) }}</span>
         </div>
 
         <div class="role-stock-card__actions">

@@ -203,7 +203,6 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "onboarding.roleProduct": "产品经理",
     "onboarding.roleEngineer": "程序员",
     "queue.collaborator": "协作者",
-    "role.lineage": "谱系 {lineage}",
     "role.cloneTag": "分身"
   },
   "en-US": {
@@ -404,7 +403,6 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "onboarding.roleProduct": "Product Manager",
     "onboarding.roleEngineer": "Programmer",
     "queue.collaborator": "Collaborator",
-    "role.lineage": "Lineage {lineage}",
     "role.cloneTag": "Clone"
   }
 };

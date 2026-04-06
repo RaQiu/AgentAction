@@ -14,7 +14,6 @@
 
     <div class="agent-card__meta">
       <span class="tag">{{ t("common.items", { count: role.currentEquipmentIds.length }) }}</span>
-      <span class="tag">{{ t("role.lineage", { lineage: role.cloneLineageId }) }}</span>
       <span v-if="role.isClone" class="tag tag--alert">{{ t("role.cloneTag") }}</span>
     </div>
 
