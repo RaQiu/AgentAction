@@ -632,7 +632,7 @@ strong {
 
 .launch-case-list__item {
   display: grid;
-  grid-template-columns: 24px minmax(0, 1fr);
+  grid-template-columns: 24px minmax(0, 1fr) 34px;
   gap: 12px;
   align-items: start;
   padding: 8px 0;
@@ -656,6 +656,30 @@ strong {
   color: var(--text);
   font-size: 0.9rem;
   line-height: 1.42;
+}
+
+.launch-case-list__action {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(24, 40, 64, 0.08);
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  color: var(--accent-strong);
+  box-shadow: 0 4px 10px rgba(39, 86, 147, 0.06);
+  transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+}
+
+.launch-case-list__action:hover {
+  transform: translateX(2px);
+  border-color: rgba(75, 137, 220, 0.22);
+  background: rgba(247, 251, 255, 1);
+}
+
+.launch-case-list__action span {
+  font-size: 1rem;
+  line-height: 1;
 }
 
 .launch-hero__actions {

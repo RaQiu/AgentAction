@@ -14,6 +14,9 @@
           >
             <span class="launch-case-list__index">{{ caseNumber(template.id) }}</span>
             <span class="launch-case-list__text">{{ templateField(template.id, "title", template.title) }}</span>
+            <RouterLink :to="templateRoute(template.id)" class="launch-case-list__action" aria-label="进入任务">
+              <span>→</span>
+            </RouterLink>
           </li>
         </ul>
 
@@ -63,5 +66,9 @@ const firstTemplateRoute = computed(() => `/templates/${templates.value[0]?.id ?
 
 function caseNumber(templateId: string) {
   return heroTemplates.value.findIndex((item) => item.id === templateId) + 1;
+}
+
+function templateRoute(templateId: string) {
+  return `/templates/${templateId}`;
 }
 </script>
