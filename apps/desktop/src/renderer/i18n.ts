@@ -63,7 +63,7 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "onboarding.cta.title": "进入首页后，你可以先看 battle，再决定派什么任务。",
     "onboarding.cta.subtitle": "只要没跳过或没完成引导，下次打开仍会先进入这里。",
 
-    "home.title": "两只AI牛马结对编程，坐等丰收",
+    "home.title": "两只AI牛马结对编程\n你坐等丰收",
     "home.subtitle": "从真实需求开始。",
     "home.primaryCta": "开始任务",
     "home.secondaryCta": "查看角色",
@@ -259,7 +259,7 @@ const uiCopy: Record<AppLocale, UiCopy> = {
     "onboarding.cta.title": "Start by watching one battle, then dispatch your own task.",
     "onboarding.cta.subtitle": "Until you skip or finish onboarding, it opens every time.",
 
-    "home.title": "Two AI workers pair program. Sit back and wait for the harvest.",
+    "home.title": "Two AI workers pair program.\nYou wait for the harvest.",
     "home.subtitle": "Start from a real need.",
     "home.primaryCta": "Start Task",
     "home.secondaryCta": "View Roles",

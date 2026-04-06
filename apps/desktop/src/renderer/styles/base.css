@@ -458,7 +458,7 @@ strong {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-width: 32rem;
+  max-width: 38rem;
 }
 
 .launch-hero__copy h1 {
@@ -466,7 +466,8 @@ strong {
   font-size: clamp(2rem, 3vw, 3rem);
   line-height: 1.08;
   letter-spacing: -0.04em;
-  max-width: 11ch;
+  max-width: 14ch;
+  white-space: pre-line;
 }
 
 .launch-hero__copy .page__lead {
